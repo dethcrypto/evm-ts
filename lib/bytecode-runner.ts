@@ -1,4 +1,7 @@
+import * as deepFreeze from 'deep-freeze'
 import {Opcode} from "./opcodes";
+
+const freeze: any = deepFreeze;  // @todo shitty typings
 
 export interface MachineState {
     pc: number;
@@ -8,7 +11,15 @@ export interface MachineState {
 }
 
 export default class BytecodeRunner {
-    public state: MachineState;
+    private _state: MachineState;
+
+    get state(): MachineState {
+        return this._state;
+    }
+
+    set state(state: MachineState) {
+        this._state = freeze(state);
+    }
 
     constructor(public program: Opcode[]) {
         this.state = {
@@ -34,9 +45,7 @@ export default class BytecodeRunner {
             return;
         }
 
-        const newState = instruction.run({...this.state});
-
-        this.state = newState;
+        this.state = instruction.run(this.state);
     }
 
     run() {

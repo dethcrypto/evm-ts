@@ -1,4 +1,5 @@
 import {MachineState} from "./bytecode-runner";
+import {getIndex} from "./utils";
 
 export abstract class Opcode {
     public id: number;
@@ -29,9 +30,8 @@ export class AddOpcode extends Opcode {
     static type = 'ADD';
 
     run(state: MachineState): MachineState {
-        // @todo use something nice to handle work with immutable data structures
-        const arg1 = state.stack.pop();
-        const arg2 = state.stack.pop();
+        const arg1 = getIndex(state.stack, -1);
+        const arg2 = getIndex(state.stack, -2);
 
         if (arg1 === null || arg1 === undefined) {
             throw new Error("Error while adding. Arg1 is undefined!")
@@ -43,10 +43,11 @@ export class AddOpcode extends Opcode {
 
         const result = arg1 + arg2;
 
-        state.stack.push(result);
-        state.pc++;
-
-        return state;
+        return {
+            ...state,
+            pc: state.pc + 1,
+            stack: [...state.stack.slice(0, -2), result],
+        };
     }
 }
 
@@ -90,10 +91,11 @@ export class PushOpcode extends Opcode {
     }
 
     run(state: MachineState): MachineState {
-        state.stack.push(this.arg);
-        state.pc++;
-
-        return state;
+        return {
+            ...state,
+            stack: [...state.stack, this.arg],
+            pc: state.pc + 1
+        };
     }
 }
 
