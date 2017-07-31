@@ -2,7 +2,8 @@ import test from 'ava';
 import { expect } from 'chai';
 
 import BytecodeRunner from '../lib/bytecode-runner';
-import * as opcodes from '../lib/opcodes'
+import * as opcodes from '../lib/opcodes';
+import { Opcode } from '../lib/opcodes/base';
 
 test('BytecodeRunner should run simple program', () => {
     const input = [
@@ -23,8 +24,8 @@ test('BytecodeRunner should run simple program', () => {
 });
 
 test('BytecodeRunner should not allow to mutate state by opcodes', () => {
-    class StateMutatingOpcode extends opcodes.Opcode {
-        run(state) {
+    class StateMutatingOpcode extends Opcode {
+        run(env, state) {
             state.stack.push(6);
             return Object.assign(state, {
                 ip: state.ip + 1,

@@ -1,5 +1,5 @@
 import * as deepFreeze from 'deep-freeze'
-import {Opcode} from "./opcodes";
+import {Opcode} from "./opcodes/base";
 
 const freeze: any = deepFreeze;  // @todo shitty typings
 
@@ -10,24 +10,28 @@ export interface MachineState {
     stopped: boolean;
 }
 
+export type Environment = boolean[];
+
 export default class BytecodeRunner {
     private _state: MachineState;
-
     get state(): MachineState {
         return this._state;
     }
-
     set state(state: MachineState) {
         this._state = freeze(state);
     }
 
-    constructor(public program: Opcode[]) {
+    private environment: Environment;
+
+    constructor(public program: Opcode[], env: Environment = []) {
         this.state = {
             pc: 0,
             stack: [],
             memory: [],
             stopped: false,
         }
+
+        this.environment = freeze(env);
     }
 
     step() {
@@ -45,7 +49,7 @@ export default class BytecodeRunner {
             return;
         }
 
-        this.state = instruction.run(this.state);
+        this.state = instruction.run(this.environment, this.state);
     }
 
     run() {

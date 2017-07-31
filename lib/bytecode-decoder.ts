@@ -1,17 +1,18 @@
 import * as invariant from 'invariant';
 import {chunk, Dictionary, keyBy} from 'lodash';
-import * as opcodes from './opcodes'
+import {Opcode} from "./opcodes/base";
+import * as opcodes from './opcodes/index'
 
-const opcodesById: Dictionary<new () => opcodes.Opcode> = keyBy(opcodes as any, 'id');
+const opcodesById: Dictionary<new () => Opcode> = keyBy(opcodes as any, 'id');
 
-export default function bytecodeDecoder(bytecode: string): opcodes.Opcode[] {
+export default function bytecodeDecoder(bytecode: string): Opcode[] {
     invariant(bytecode.length % 2 === 0, "Bytecode cannot be properly read as bytes.");
 
     const bytes: number[] = chunk(bytecode.split(''), 2).map(byte => parseInt(`${byte[0]}${byte[1]}`, 16));
 
     const bytesIterator = bytes[Symbol.iterator]();
 
-    let opcodes: opcodes.Opcode[] = [];
+    let opcodes: Opcode[] = [];
     let byte = bytesIterator.next();
     while (!byte.done) {
         opcodes.push(decodeOpcode(byte.value, bytesIterator));
@@ -20,7 +21,7 @@ export default function bytecodeDecoder(bytecode: string): opcodes.Opcode[] {
     return opcodes;
 }
 
-function decodeOpcode(opcodeByte: number, bytes: Iterator<number>): opcodes.Opcode {
+function decodeOpcode(opcodeByte: number, bytes: Iterator<number>): Opcode {
     const OpcodeClass = opcodesById[opcodeByte.toString()];
 
     if (!OpcodeClass) {
