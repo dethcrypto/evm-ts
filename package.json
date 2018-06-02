@@ -1,10 +1,19 @@
 {
-  "name": "evm-sim",
-  "version": "1.0.0",
+  "name": "evm-ts",
+  "version": "0.0.1",
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "test": "ava test/*.spec.js"
+    "format": "prettier --list-different '**/*.{ts,json,md, gql}'",
+    "format:fix": "prettier --write '**/*.{ts,json,md,gql}'",
+    "tslint": "tslint -p ./tsconfig.json -e 'node_modules/**/*' -e '**/node_modules/**/*' '**/*.ts'",
+    "tslint:fix": "tslint --fix --format stylish -p ./tsconfig.json -e 'node_modules/**/*' -e '**/node_modules/**/*' '**/*.ts'",
+    "tsc": "tsc --noEmit",
+    "lint": "yarn format && yarn tslint && yarn tsc",
+    "lint:fix": "yarn format:fix && yarn tslint:fix && yarn tsc",
+    "test": "yarn lint && yarn test:ava",
+    "test:fix": "yarn lint:fix && yarn test:ava",
+    "test:ava": "ava test/*.spec.js"
   },
   "ava": {
     "require": [
@@ -16,15 +25,18 @@
     "ava": "^0.21.0",
     "deep-freeze": "^0.0.1",
     "invariant": "^2.2.2",
-    "lodash": "^4.17.4"
+    "lodash": "^4.17.10",
+    "prettier": "^1.13.4",
+    "tslint": "^5.10.0",
+    "typestrict": "^0.0.8"
   },
   "devDependencies": {
     "@types/chai": "^4.0.1",
     "@types/deep-freeze": "^0.1.1",
     "@types/invariant": "^2.2.28",
-    "@types/lodash": "^4.14.71",
+    "@types/lodash": "^4.14.109",
     "chai": "^4.1.0",
-    "ts-node": "^3.3.0",
-    "typescript": "^2.4.2"
+    "ts-node": "^6.0.5",
+    "typescript": "^2.9.1"
   }
 }
