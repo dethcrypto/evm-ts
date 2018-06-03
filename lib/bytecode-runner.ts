@@ -13,7 +13,7 @@ export interface IMachineState {
 export type Environment = boolean[];
 
 export default class BytecodeRunner {
-  private _state: IMachineState;
+  private _state!: IMachineState;
   get state(): IMachineState {
     return this._state;
   }
