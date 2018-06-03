@@ -1,7 +1,7 @@
 import * as invariant from "invariant";
 import { chunk, Dictionary, keyBy } from "lodash";
 
-import { Opcode } from "./opcodes/base";
+import { Opcode, UnknownOpcodeError } from "./opcodes/common";
 import * as opcodes from "./opcodes/index";
 import { PeekableIterator } from "./utils/PeekableIterator";
 import { decodePushFromBytecode } from "./opcodes/index";
@@ -18,7 +18,9 @@ export default function bytecodeDecoder(bytecode: string): Opcode[] {
   const bytesIterator = new PeekableIterator(bytes);
 
   let opcodes: Opcode[] = [];
-  while (!bytesIterator.hasNext()) {
+  while (bytesIterator.hasNext()) {
+    bytesIterator.next();
+
     opcodes.push(decodeOpcode(bytesIterator));
   }
   return opcodes;
@@ -27,7 +29,7 @@ export default function bytecodeDecoder(bytecode: string): Opcode[] {
 function decodeOpcode(bytesIterator: PeekableIterator<number>): Opcode {
   const opcode = decodeStaticOpcode(bytesIterator) || decodeDynamicOpcode(bytesIterator);
 
-  if (!opcode) throw new Error("Could not decode opcode.");
+  if (!opcode) throw new UnknownOpcodeError(bytesIterator.index, bytesIterator.peek());
 
   return opcode;
 }

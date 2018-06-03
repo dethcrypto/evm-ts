@@ -1,4 +1,4 @@
-import { Opcode } from "./base";
+import { Opcode, DecodeError } from "./common";
 import { Environment, IMachineState } from "../bytecode-runner";
 import { PeekableIterator } from "../utils/PeekableIterator";
 
@@ -12,13 +12,18 @@ const range = 31;
 
 export function decodePushFromBytecode(bytecodeIterator: PeekableIterator<number>): PushOpcode | undefined {
   const opcode = bytecodeIterator.peek();
-  if (opcode < baseId && opcode > baseId + range) return;
+  if (opcode < baseId || opcode > baseId + range) return;
 
   const byteNumber = opcode - baseId + 1;
 
-  const args = bytecodeIterator.take(byteNumber);
+  try {
+    bytecodeIterator.next();
+    const args = bytecodeIterator.take(byteNumber);
 
-  return new PushOpcode(byteNumber, args);
+    return new PushOpcode(byteNumber, args);
+  } catch (e) {
+    throw new DecodeError(bytecodeIterator.index, "PUSH");
+  }
 }
 
 export class PushOpcode extends Opcode {

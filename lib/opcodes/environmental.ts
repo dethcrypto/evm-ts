@@ -1,4 +1,4 @@
-import { Opcode } from "./base";
+import { Opcode } from "./common";
 import { Environment, IMachineState } from "../bytecode-runner";
 import { getIndex, bitsToNumber } from "../utils";
 

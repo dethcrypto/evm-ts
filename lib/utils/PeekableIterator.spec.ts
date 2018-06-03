@@ -6,6 +6,7 @@ describe("PeekableIterator", () => {
     const input = [1, 2];
 
     const iterator = new PeekableIterator(input);
+    iterator.next();
 
     expect(iterator.peek()).to.be.eq(1);
     expect(iterator.peek()).to.be.eq(1);
@@ -23,15 +24,26 @@ describe("PeekableIterator", () => {
 
     const iterator = new PeekableIterator(input);
 
-    expect(() => iterator.peek()).to.throw("Index out of bounds.");
+    expect(() => iterator.peek()).to.throw("Index out of bounds: -1");
   });
 
   it("should take n", () => {
     const input = [1, 2, 3];
 
     const iterator = new PeekableIterator(input);
+    iterator.next();
 
     expect(iterator.take(2)).to.be.deep.eq([1, 2]);
     expect(iterator.peek()).to.be.eq(3);
+  });
+
+  it("should throw on take n when it doesnt have enough elements", () => {
+    const input = [1, 2];
+
+    const iterator = new PeekableIterator(input);
+    iterator.next();
+    iterator.next();
+
+    expect(() => iterator.take(2)).to.throw("Index out of bounds: 2");
   });
 });

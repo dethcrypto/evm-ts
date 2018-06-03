@@ -1,24 +1,19 @@
 import { expect } from "chai";
 
 import bytecodeDecoder from "./bytecode-decoder";
+import { PushOpcode } from "./opcodes";
 
 describe("BytecodeDecoder", () => {
   it("should decode push operation", () => {
-    const input = "6060";
-    const expected = [
-      {
-        id: 96,
-        type: "PUSH1",
-        arg: 96,
-      },
-    ];
+    const input = "6061";
+    const expected = [new PushOpcode(1, [0x61])];
 
     expect(bytecodeDecoder(input)).to.be.deep.eq(expected);
   });
 
   it("should not decode malformed push opcode", () => {
     const input = "60";
-    const expected = "Argument to PUSH opcode is missing!";
+    const expected = "Decoding PUSH failed at 1 byte of the bytecode";
 
     expect(() => bytecodeDecoder(input)).to.throw(Error, expected);
   });
@@ -32,7 +27,7 @@ describe("BytecodeDecoder", () => {
 
   it("should not decode unknown opcode", () => {
     const input = "fe";
-    const expected = "Unrecognized opcode: fe";
+    const expected = "Unknown opcode: 0xfe at 0 byte of the bytecode";
 
     expect(() => bytecodeDecoder(input)).to.throw(Error, expected);
   });

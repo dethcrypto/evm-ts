@@ -12,3 +12,15 @@ export abstract class Opcode {
 
   abstract run(environment: Environment, state: IMachineState): IMachineState;
 }
+
+export class DecodeError extends Error {
+  constructor(public readonly index: number, public readonly opcode: string) {
+    super(`Decoding ${opcode} failed at ${index} byte of the bytecode`);
+  }
+}
+
+export class UnknownOpcodeError extends Error {
+  constructor(public readonly index: number, public readonly opcode: number) {
+    super(`Unknown opcode: 0x${opcode.toString(16)} at ${index} byte of the bytecode`);
+  }
+}

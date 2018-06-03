@@ -1,5 +1,5 @@
 import { Environment, IMachineState } from "../bytecode-runner";
-import { Opcode } from "./base";
+import { Opcode } from "./common";
 
 export class MStoreOpcode extends Opcode {
   static id = 0x52;

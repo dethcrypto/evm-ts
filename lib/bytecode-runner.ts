@@ -1,5 +1,5 @@
 import * as deepFreeze from "deep-freeze";
-import { Opcode } from "./opcodes/base";
+import { Opcode } from "./opcodes/common";
 
 const freeze: any = deepFreeze; // @todo shitty typings
 
