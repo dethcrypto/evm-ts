@@ -1,15 +1,33 @@
 import { Opcode } from "./base";
 import { Environment, IMachineState } from "../bytecode-runner";
+import { PeekableIterator } from "../utils/PeekableIterator";
+
+/**
+ * PUSH is a family of opcodes.
+ */
+
+const baseId = 0x60;
+const baseType = "PUSH";
+const range = 31;
+
+export function decodePushFromBytecode(bytecodeIterator: PeekableIterator<number>): PushOpcode | undefined {
+  const opcode = bytecodeIterator.peek();
+  if (opcode < baseId && opcode > baseId + range) return;
+
+  const byteNumber = opcode - baseId + 1;
+
+  const args = bytecodeIterator.take(byteNumber);
+
+  return new PushOpcode(byteNumber, args);
+}
 
 export class PushOpcode extends Opcode {
-  static id = 0x60;
-  static type = "PUSH1";
-
-  constructor(public arg: number) {
-    super();
+  constructor(public byteNumber: number, public args: number[]) {
+    super(baseId + byteNumber, `${baseType}${byteNumber}`);
 
     // @todo handle undefined cases with helpers (lodash?, require?)
-    if (arg === undefined) {
+    // @todo this should take byteNumber into account
+    if (args === undefined) {
       throw new Error("Argument to PUSH opcode is missing!");
     }
   }
@@ -17,7 +35,7 @@ export class PushOpcode extends Opcode {
   run(_env: Environment, state: IMachineState): IMachineState {
     return {
       ...state,
-      stack: [...state.stack, this.arg],
+      stack: [...state.stack, ...this.args],
       pc: state.pc + 1,
     };
   }

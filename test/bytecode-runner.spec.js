@@ -7,8 +7,8 @@ import { Opcode } from '../lib/opcodes/base';
 
 test('BytecodeRunner should run simple program', () => {
     const input = [
-        new opcodes.PushOpcode(1),
-        new opcodes.PushOpcode(2),
+        new opcodes.PushOpcode(1, [1]),
+        new opcodes.PushOpcode(1, [2]),
         new opcodes.AddOpcode(),
     ];
     const expectedState = {
