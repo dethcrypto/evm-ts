@@ -1,6 +1,7 @@
 import { Opcode } from "./common";
 import { Environment, IMachineState } from "../bytecode-runner";
-import { getIndex, bitsToNumber } from "../utils";
+import { bitsToNumber } from "../utils/bytes";
+import { getIndex } from "../utils/arrays";
 
 export class LoadCallData extends Opcode {
   static id = 0x35;

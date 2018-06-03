@@ -6,9 +6,3 @@ export function getIndex<T>(array: T[], index: number): T {
     return array[finalIndex];
   }
 }
-
-export function bitsToNumber(array: boolean[]): number {
-  return array.reduce((acc, value) => {
-    return (acc << 2) + (value ? 1 : 0);
-  }, 0);
-}

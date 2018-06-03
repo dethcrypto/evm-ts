@@ -1,4 +1,4 @@
-import { PeekableIterator } from "./PeekableIterator";
+import { PeekableIterator } from "../PeekableIterator";
 import { expect } from "chai";
 
 describe("PeekableIterator", () => {

@@ -1,12 +1,15 @@
 import { expect } from "chai";
 
-import bytecodeDecoder from "./bytecode-decoder";
-import { PushOpcode } from "./opcodes";
+import bytecodeDecoder from "../bytecode-decoder";
+import { PushOpcode } from "../opcodes";
+import { byteStringToNumberArray } from "../utils/bytes";
 
 describe("BytecodeDecoder", () => {
   it("should decode push operation", () => {
-    const input = "616101";
-    const expected = [new PushOpcode(2, [0x61, 0x01])];
+    const input = "7f4e616d6552656700000000000000000000000000000000000000000000000000";
+    const expected = [
+      new PushOpcode(32, byteStringToNumberArray("4e616d6552656700000000000000000000000000000000000000000000000000")),
+    ];
 
     expect(bytecodeDecoder(input)).to.be.deep.eq(expected);
   });
@@ -20,7 +23,7 @@ describe("BytecodeDecoder", () => {
 
   it("should not decode malformed opcodes", () => {
     const input = "606";
-    const expected = "Bytecode cannot be properly read as bytes.";
+    const expected = "Byte string cannot be properly read as bytes.";
 
     expect(() => bytecodeDecoder(input)).to.throw(Error, expected);
   });

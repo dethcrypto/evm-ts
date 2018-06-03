@@ -1,3 +1,5 @@
+import * as invariant from "invariant";
+
 import { Opcode, DecodeError } from "./common";
 import { Environment, IMachineState } from "../bytecode-runner";
 import { PeekableIterator } from "../utils/PeekableIterator";
@@ -30,11 +32,7 @@ export class PushOpcode extends Opcode {
   constructor(public byteNumber: number, public args: number[]) {
     super(baseId + byteNumber, `${baseType}${byteNumber}`);
 
-    // @todo handle undefined cases with helpers (lodash?, require?)
-    // @todo this should take byteNumber into account
-    if (args === undefined) {
-      throw new Error("Argument to PUSH opcode is missing!");
-    }
+    invariant(byteNumber === args.length, `byte number (${byteNumber}) doesn't match args bytes: ${args.length}`);
   }
 
   run(_env: Environment, state: IMachineState): IMachineState {

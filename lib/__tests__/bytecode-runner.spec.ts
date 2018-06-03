@@ -1,8 +1,8 @@
 import { expect } from "chai";
 
-import BytecodeRunner, { Environment, IMachineState } from "./bytecode-runner";
-import * as opcodes from "./opcodes";
-import { Opcode } from "./opcodes/common";
+import BytecodeRunner, { Environment, IMachineState } from "../bytecode-runner";
+import * as opcodes from "../opcodes";
+import { Opcode } from "../opcodes/common";
 
 describe("BytecodeRunner", () => {
   it("should run simple program", () => {

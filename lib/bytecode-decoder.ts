@@ -1,19 +1,18 @@
 import * as invariant from "invariant";
-import { chunk, Dictionary, keyBy } from "lodash";
+import { Dictionary, keyBy } from "lodash";
 
 import { Opcode, UnknownOpcodeError } from "./opcodes/common";
 import * as opcodes from "./opcodes/index";
 import { PeekableIterator } from "./utils/PeekableIterator";
 import { decodePushFromBytecode } from "./opcodes/index";
+import { byteStringToNumberArray } from "./utils/bytes";
 
 const opcodesById: Dictionary<new () => Opcode> = keyBy(opcodes as any, "id");
 
 const dynamicOpcodesDecoders = [decodePushFromBytecode];
 
 export default function bytecodeDecoder(bytecode: string): Opcode[] {
-  invariant(bytecode.length % 2 === 0, "Bytecode cannot be properly read as bytes.");
-
-  const bytes: number[] = chunk(bytecode.split(""), 2).map(byte => parseInt(`${byte[0]}${byte[1]}`, 16));
+  const bytes = byteStringToNumberArray(bytecode);
 
   const bytesIterator = new PeekableIterator(bytes);
 
