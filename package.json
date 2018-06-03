@@ -11,19 +11,11 @@
     "tsc": "tsc --noEmit",
     "lint": "yarn format && yarn tslint && yarn tsc",
     "lint:fix": "yarn format:fix && yarn tslint:fix && yarn tsc",
-    "test": "yarn lint && yarn test:ava && yarn test:mocha",
-    "test:fix": "yarn lint:fix && yarn test:ava",
-    "test:ava": "ava test/*.spec.js",
+    "test": "yarn lint && yarn test:mocha",
+    "test:fix": "yarn lint:fix && yarn test:mocha",
     "test:mocha": "NODE_ENV=test mocha --require ts-node/register '**/*.spec.ts'"
   },
-  "ava": {
-    "require": [
-      "ts-node/register"
-    ],
-    "failWithoutAssertions": false
-  },
   "dependencies": {
-    "ava": "^0.21.0",
     "deep-freeze": "^0.0.1",
     "invariant": "^2.2.2",
     "lodash": "^4.17.10",
