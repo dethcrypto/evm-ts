@@ -1,5 +1,5 @@
 import * as deepFreeze from "deep-freeze";
-import { Opcode } from "./opcodes/base";
+import { Opcode } from "./opcodes/common";
 
 const freeze: any = deepFreeze; // @todo shitty typings
 
@@ -13,7 +13,7 @@ export interface IMachineState {
 export type Environment = boolean[];
 
 export default class BytecodeRunner {
-  private _state: IMachineState;
+  private _state!: IMachineState;
   get state(): IMachineState {
     return this._state;
   }
