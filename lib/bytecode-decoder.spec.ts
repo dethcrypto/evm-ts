@@ -5,8 +5,8 @@ import { PushOpcode } from "./opcodes";
 
 describe("BytecodeDecoder", () => {
   it("should decode push operation", () => {
-    const input = "6061";
-    const expected = [new PushOpcode(1, [0x61])];
+    const input = "616101";
+    const expected = [new PushOpcode(2, [0x61, 0x01])];
 
     expect(bytecodeDecoder(input)).to.be.deep.eq(expected);
   });
