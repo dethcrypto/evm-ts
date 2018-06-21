@@ -7,6 +7,8 @@ describe("runEvm", () => {
       "simple push instruction": "7f4e616d6552656700000000000000000000000000000000000000000000000000",
       "add with overflow":
         "7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff01",
+      "mul with overflow":
+        "7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff02",
     };
 
     Object.keys(tests).forEach(name => {

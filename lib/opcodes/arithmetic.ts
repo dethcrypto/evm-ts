@@ -47,8 +47,8 @@ export class MulOpcode extends Opcode {
 
   run(_env: Environment, state: IMachineState): IMachineState {
     // @todo use something nice to handle work with immutable data structures
-    const arg1 = state.stack.pop();
-    const arg2 = state.stack.pop();
+    const arg1 = getIndex(state.stack, -1);
+    const arg2 = getIndex(state.stack, -2);
 
     if (arg1 === null || arg1 === undefined) {
       throw new Error("Error while adding. Arg1 is undefined!");
@@ -58,11 +58,12 @@ export class MulOpcode extends Opcode {
       throw new Error("Error while adding. Arg2 is undefined!");
     }
 
-    const result = arg1.mul(arg2);
+    const result = arg1.mul(arg2).mod(MAX_UINT_256);
 
-    state.stack.push(result);
-    state.pc++;
-
-    return state;
+    return {
+      ...state,
+      pc: state.pc + 1,
+      stack: [...state.stack.slice(0, -2), result],
+    };
   }
 }
