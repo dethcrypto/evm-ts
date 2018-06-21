@@ -1,18 +1,20 @@
 import * as deepFreeze from "deep-freeze";
+import { BN } from "bn.js";
+
 import { Opcode } from "./opcodes/common";
 
 const freeze: any = deepFreeze; // @todo shitty typings
 
 export interface IMachineState {
   pc: number;
-  stack: number[];
+  stack: BN[];
   memory: number[];
   stopped: boolean;
 }
 
 export type Environment = boolean[];
 
-export default class BytecodeRunner {
+export class BytecodeRunner {
   private _state!: IMachineState;
   get state(): IMachineState {
     return this._state;

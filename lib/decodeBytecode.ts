@@ -11,15 +11,13 @@ const opcodesById: Dictionary<new () => Opcode> = keyBy(opcodes as any, "id");
 
 const dynamicOpcodesDecoders = [decodePushFromBytecode];
 
-export default function bytecodeDecoder(bytecode: string): Opcode[] {
+export function decodeBytecode(bytecode: string): Opcode[] {
   const bytes = byteStringToNumberArray(bytecode);
 
   const bytesIterator = new PeekableIterator(bytes);
 
   let opcodes: Opcode[] = [];
-  while (bytesIterator.hasNext()) {
-    bytesIterator.next();
-
+  while (!bytesIterator.done()) {
     opcodes.push(decodeOpcode(bytesIterator));
   }
   return opcodes;
@@ -39,6 +37,7 @@ function decodeStaticOpcode(bytesIterator: PeekableIterator<number>): Opcode | u
   const OpcodeClass = opcodesById[opcodeByte.toString()];
 
   if (!OpcodeClass) return;
+  bytesIterator.next();
 
   return new OpcodeClass();
 }

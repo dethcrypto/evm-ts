@@ -1,5 +1,6 @@
 import * as invariant from "invariant";
 import { chunk } from "lodash";
+import { BN } from "bn.js";
 
 export function bitsToNumber(array: boolean[]): number {
   return array.reduce((acc, value) => {
@@ -12,3 +13,5 @@ export function byteStringToNumberArray(bytesString: string): number[] {
 
   return chunk(bytesString.split(""), 2).map(byte => parseInt(`${byte[0]}${byte[1]}`, 16));
 }
+
+export const MAX_UINT_256 = new BN(2).pow(new BN(256));
