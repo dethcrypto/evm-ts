@@ -11,7 +11,7 @@ const opcodesById: Dictionary<new () => Opcode> = keyBy(opcodes as any, "id");
 
 const dynamicOpcodesDecoders = [decodePushFromBytecode];
 
-export default function bytecodeDecoder(bytecode: string): Opcode[] {
+export function decodeBytecode(bytecode: string): Opcode[] {
   const bytes = byteStringToNumberArray(bytecode);
 
   const bytesIterator = new PeekableIterator(bytes);

@@ -1,7 +1,8 @@
 import * as invariant from "invariant";
+import { BN } from "bn.js";
 
 import { Opcode, DecodeError } from "./common";
-import { Environment, IMachineState } from "../bytecode-runner";
+import { Environment, IMachineState } from "../BytecodeRunner";
 import { PeekableIterator } from "../utils/PeekableIterator";
 
 /**
@@ -20,25 +21,28 @@ export function decodePushFromBytecode(bytecodeIterator: PeekableIterator<number
 
   try {
     bytecodeIterator.next();
-    const args = bytecodeIterator.take(byteNumber);
+    const arg = bytecodeIterator.take(byteNumber);
 
-    return new PushOpcode(byteNumber, args);
+    return new PushOpcode(byteNumber, new BN(arg));
   } catch (e) {
     throw new DecodeError(bytecodeIterator.index, "PUSH");
   }
 }
 
 export class PushOpcode extends Opcode {
-  constructor(public byteNumber: number, public args: number[]) {
+  constructor(public byteNumber: number, public arg: BN) {
     super(baseId + byteNumber, `${baseType}${byteNumber}`);
 
-    invariant(byteNumber === args.length, `byte number (${byteNumber}) doesn't match args bytes: ${args.length}`);
+    invariant(
+      byteNumber === arg.toArray().length,
+      `byte number (${byteNumber}) doesn't match args bytes: ${arg.toString()}`,
+    );
   }
 
   run(_env: Environment, state: IMachineState): IMachineState {
     return {
       ...state,
-      stack: [...state.stack, ...this.args],
+      stack: [...state.stack, this.arg],
       pc: state.pc + 1,
     };
   }

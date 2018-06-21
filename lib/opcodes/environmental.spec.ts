@@ -1,30 +1,31 @@
-import { expect } from "chai";
+/* tslint:disable */
+// import { expect } from "chai";
 
-import { LoadCallData } from "./environmental";
-import { IMachineState } from "../bytecode-runner";
+// import { LoadCallData } from "./environmental";
+// import { IMachineState } from "../BytecodeRunner";
 
-describe("LoadCallData", () => {
-  it.skip("LoadCallData should load data from environment", () => {
-    const loadCallData = new LoadCallData();
-    const env = Array.from(Array(5)).map(() => false);
-    env[30] = true;
-    env[31] = true;
-    const state = {
-      stack: [0],
-      pc: 0,
-      memory: [0],
-      stopped: false,
-    };
+// describe("LoadCallData", () => {
+//   it.skip("LoadCallData should load data from environment", () => {
+//     const loadCallData = new LoadCallData();
+//     const env = Array.from(Array(5)).map(() => false);
+//     env[30] = true;
+//     env[31] = true;
+//     const state = {
+//       stack: [0],
+//       pc: 0,
+//       memory: [0],
+//       stopped: false,
+//     };
 
-    const expected: IMachineState = {
-      stack: [3],
-      pc: 0,
-      memory: [0],
-      stopped: false,
-    };
+//     const expected: IMachineState = {
+//       stack: [3],
+//       pc: 0,
+//       memory: [0],
+//       stopped: false,
+//     };
 
-    const actual = loadCallData.run(env, state);
+//     const actual = loadCallData.run(env, state);
 
-    expect(actual).to.be.deep.eq(expected);
-  });
-});
+//     expect(actual).to.be.deep.eq(expected);
+//   });
+// });
