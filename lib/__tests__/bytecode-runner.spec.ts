@@ -20,20 +20,32 @@ describe("BytecodeRunner", () => {
     expect(bytecodeRunner.state).to.deep.eq(expectedState);
   });
 
-  it("should not allow to mutate state by opcodes", () => {
+  it("should clone state before passing it to opcodes", () => {
+    const initialState = {
+      pc: 0,
+      stack: [new BN(1), new BN(2)],
+      memory: [],
+      stopped: false,
+    };
+
     class StateMutatingOpcode extends Opcode {
-      run(_environment: Environment, state: IMachineState): IMachineState {
+      run(_environment: Environment, state: IMachineState): void {
         state.stack.push(new BN(6));
-        return Object.assign(state, {
-          pc: state.pc + 1,
-        });
+        state.pc += 1;
       }
     }
 
     const input = [new StateMutatingOpcode()];
     const expected = "Cannot add property 0, object is not extensible";
 
-    const bytecodeRunner = new BytecodeRunner(input);
-    expect(() => bytecodeRunner.run()).to.throw(Error, expected);
+    const bytecodeRunner = new BytecodeRunner(input, [], initialState);
+    expect(() => bytecodeRunner.run()).to.not.throw(Error, expected);
+    expect(initialState).to.deep.eq({ ...initialState });
+    expect(bytecodeRunner.state).to.deep.eq({
+      ...initialState,
+      stack: [new BN(1), new BN(2), new BN(6)],
+      pc: 1,
+      stopped: true,
+    });
   });
 });

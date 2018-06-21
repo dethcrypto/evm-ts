@@ -10,7 +10,8 @@ export abstract class Opcode {
     this.type = type || (this.constructor as any).type;
   }
 
-  abstract run(environment: Environment, state: IMachineState): IMachineState;
+  // it should mutate input data. VM makes sure to clone them first
+  abstract run(environment: Environment, state: IMachineState): void;
 }
 
 export class DecodeError extends Error {

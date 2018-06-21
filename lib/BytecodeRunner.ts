@@ -1,9 +1,6 @@
-import * as deepFreeze from "deep-freeze";
 import { BN } from "bn.js";
 
 import { Opcode } from "./opcodes/common";
-
-const freeze: any = deepFreeze; // @todo shitty typings
 
 export interface IMachineState {
   pc: number;
@@ -11,30 +8,21 @@ export interface IMachineState {
   memory: number[];
   stopped: boolean;
 }
-
 export type Environment = boolean[];
 
+const initialState = {
+  pc: 0,
+  stack: [],
+  memory: [],
+  stopped: false,
+};
+
 export class BytecodeRunner {
-  private _state!: IMachineState;
-  get state(): IMachineState {
-    return this._state;
-  }
-  set state(state: IMachineState) {
-    this._state = freeze(state);
-  }
-
-  private environment: Environment;
-
-  constructor(public program: Opcode[], env: Environment = []) {
-    this.state = {
-      pc: 0,
-      stack: [],
-      memory: [],
-      stopped: false,
-    };
-
-    this.environment = freeze(env);
-  }
+  constructor(
+    public program: Opcode[],
+    public environment: Environment = [],
+    public state = deepCloneState(initialState),
+  ) {}
 
   step(): void {
     if (this.state.stopped) {
@@ -51,7 +39,10 @@ export class BytecodeRunner {
       return;
     }
 
-    this.state = instruction.run(this.environment, this.state);
+    // opcodes mutate states so we deep clone it first
+    const newState = deepCloneState(this.state);
+    instruction.run(this.environment, newState);
+    this.state = newState;
   }
 
   run(): void {
@@ -59,4 +50,13 @@ export class BytecodeRunner {
       this.step();
     }
   }
+}
+
+function deepCloneState(state: IMachineState): IMachineState {
+  return {
+    pc: state.pc,
+    stopped: state.stopped,
+    stack: [...state.stack],
+    memory: [...state.memory],
+  };
 }
