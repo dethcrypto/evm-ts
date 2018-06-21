@@ -1,7 +1,7 @@
 import { expect } from "chai";
 
 import { decodeBytecode } from "../decodeBytecode";
-import { PushOpcode } from "../opcodes";
+import { PushOpcode, AddOpcode } from "../opcodes";
 import { BN } from "bn.js";
 
 describe("BytecodeDecoder", () => {
@@ -9,6 +9,18 @@ describe("BytecodeDecoder", () => {
     const input = "7f4e616d6552656700000000000000000000000000000000000000000000000000";
     const expected = [
       new PushOpcode(32, new BN("4e616d6552656700000000000000000000000000000000000000000000000000", 16)),
+    ];
+
+    expect(decodeBytecode(input)).to.be.deep.eq(expected);
+  });
+
+  it("should decode multiple ops operation", () => {
+    const input =
+      "7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff01";
+    const expected = [
+      new PushOpcode(32, new BN("ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff", 16)),
+      new PushOpcode(32, new BN("ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff", 16)),
+      new AddOpcode(),
     ];
 
     expect(decodeBytecode(input)).to.be.deep.eq(expected);

@@ -1,6 +1,7 @@
 import { Opcode } from "./common";
 import { Environment, IMachineState } from "../BytecodeRunner";
 import { getIndex } from "../utils/arrays";
+import { MAX_UINT_256 } from "../utils/bytes";
 
 export class StopOpcode extends Opcode {
   static id = 0x00;
@@ -30,7 +31,7 @@ export class AddOpcode extends Opcode {
       throw new Error("Error while adding. Arg2 is undefined!");
     }
 
-    const result = arg1.add(arg2);
+    const result = arg1.add(arg2).mod(MAX_UINT_256);
 
     return {
       ...state,

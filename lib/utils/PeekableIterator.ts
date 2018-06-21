@@ -1,13 +1,10 @@
 /**
  * Array iterator which allows for read (peeking) first element multiple times. ES6's iterator can't provide that behaviour.
  *
- * Right after creation using iterator.peek() will result in error since iterator is not yet initialized. You need to move it to the first item with iterator.next()
- * This allows for writing nicer loops — while(iterator.hasNext()) { ... }
- *
  * Related: rust's std::iter::Peekable
  */
 export class PeekableIterator<T> {
-  public index = -1;
+  public index = 0;
   constructor(private array: Array<T>) {}
 
   public peek(): T {
@@ -35,6 +32,10 @@ export class PeekableIterator<T> {
 
   public hasNext(): boolean {
     return this.index + 1 < this.array.length;
+  }
+
+  public done(): boolean {
+    return this.index >= this.array.length;
   }
 }
 

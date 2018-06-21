@@ -17,9 +17,7 @@ export function decodeBytecode(bytecode: string): Opcode[] {
   const bytesIterator = new PeekableIterator(bytes);
 
   let opcodes: Opcode[] = [];
-  while (bytesIterator.hasNext()) {
-    bytesIterator.next();
-
+  while (!bytesIterator.done()) {
     opcodes.push(decodeOpcode(bytesIterator));
   }
   return opcodes;
@@ -39,6 +37,7 @@ function decodeStaticOpcode(bytesIterator: PeekableIterator<number>): Opcode | u
   const OpcodeClass = opcodesById[opcodeByte.toString()];
 
   if (!OpcodeClass) return;
+  bytesIterator.next();
 
   return new OpcodeClass();
 }
