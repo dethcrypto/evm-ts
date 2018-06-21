@@ -4,6 +4,7 @@ import { BN } from "bn.js";
 import { BytecodeRunner, Environment, IMachineState } from "../BytecodeRunner";
 import * as opcodes from "../opcodes";
 import { Opcode } from "../opcodes/common";
+import { Stack } from "../utils/Stack";
 
 describe("BytecodeRunner", () => {
   it("should run simple program", () => {
@@ -21,9 +22,9 @@ describe("BytecodeRunner", () => {
   });
 
   it("should clone state before passing it to opcodes", () => {
-    const initialState = {
+    const initialState: IMachineState = {
       pc: 0,
-      stack: [new BN(1), new BN(2)],
+      stack: new Stack([new BN(1), new BN(2)]),
       memory: [],
       stopped: false,
     };

@@ -19,14 +19,6 @@ export class AddOpcode extends Opcode {
     const arg1 = state.stack.pop();
     const arg2 = state.stack.pop();
 
-    if (arg1 === null || arg1 === undefined) {
-      throw new Error("Error while adding. Arg1 is undefined!");
-    }
-
-    if (arg2 === null || arg2 === undefined) {
-      throw new Error("Error while adding. Arg2 is undefined!");
-    }
-
     const result = arg1.add(arg2).mod(MAX_UINT_256);
 
     state.pc += 1;
@@ -41,14 +33,6 @@ export class MulOpcode extends Opcode {
   run(_env: Environment, state: IMachineState): void {
     const arg1 = state.stack.pop();
     const arg2 = state.stack.pop();
-
-    if (arg1 === null || arg1 === undefined) {
-      throw new Error("Error while adding. Arg1 is undefined!");
-    }
-
-    if (arg2 === null || arg2 === undefined) {
-      throw new Error("Error while adding. Arg2 is undefined!");
-    }
 
     const result = arg1.mul(arg2).mod(MAX_UINT_256);
 

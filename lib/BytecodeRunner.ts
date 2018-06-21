@@ -1,18 +1,19 @@
 import { BN } from "bn.js";
 
 import { Opcode } from "./opcodes/common";
+import { Stack } from "./utils/Stack";
 
 export interface IMachineState {
   pc: number;
-  stack: BN[];
+  stack: Stack<BN>;
   memory: number[];
   stopped: boolean;
 }
 export type Environment = boolean[];
 
-const initialState = {
+const initialState: IMachineState = {
   pc: 0,
-  stack: [],
+  stack: new Stack(),
   memory: [],
   stopped: false,
 };
@@ -56,7 +57,7 @@ function deepCloneState(state: IMachineState): IMachineState {
   return {
     pc: state.pc,
     stopped: state.stopped,
-    stack: [...state.stack],
+    stack: new Stack(state.stack),
     memory: [...state.memory],
   };
 }
