@@ -1,23 +1,22 @@
 import { compareWithReferentialImpl } from "./integration/referential-implementation-utils";
-import { Dictionary } from "lodash";
 
 describe("runEvm", () => {
   describe("should work with", () => {
-    const tests: Dictionary<string> = {
-      "simple push instruction": "7f4e616d6552656700000000000000000000000000000000000000000000000000",
-      "add with overflow":
+    it("simple push instruction", () =>
+      compareWithReferentialImpl("7f4e616d6552656700000000000000000000000000000000000000000000000000"));
+
+    it("add with overflow", () =>
+      compareWithReferentialImpl(
         "7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff01",
-      "mul with overflow":
+      ));
+
+    it("mul with overflow", () =>
+      compareWithReferentialImpl(
         "7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff02",
-      "mstore simple": "6060600052",
-    };
+      ));
 
-    Object.keys(tests).forEach(name => {
-      const code = tests[name];
+    it("mstore simple", () => compareWithReferentialImpl("6060600052"));
 
-      it(name, () => {
-        return compareWithReferentialImpl(code);
-      });
-    });
+    it.skip("mstore with more than 1 word size data");
   });
 });
