@@ -1,4 +1,16 @@
 /**
+ * Gets array index, supports negative indexes to access elements from the end
+ */
+export function getIndex<T>(array: T[], index: number): T | undefined {
+  if (index >= 0) {
+    return array[index];
+  } else {
+    const finalIndex = array.length + index;
+    return array[finalIndex];
+  }
+}
+
+/**
  * Copies `arrayToCopy` into target `array` beginning at index `at`
  * Returns new array, doesnt modify `target` array
  */

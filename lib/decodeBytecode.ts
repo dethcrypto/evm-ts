@@ -1,4 +1,3 @@
-import * as invariant from "invariant";
 import { Dictionary, keyBy } from "lodash";
 
 import { Opcode, UnknownOpcodeError } from "./opcodes/common";
@@ -6,10 +5,11 @@ import * as opcodes from "./opcodes/index";
 import { PeekableIterator } from "./utils/PeekableIterator";
 import { decodePushFromBytecode } from "./opcodes/index";
 import { byteStringToNumberArray } from "./utils/bytes";
+import { decodeDupFromBytecode } from "./opcodes/dup";
 
 const opcodesById: Dictionary<new () => Opcode> = keyBy(opcodes as any, "id");
 
-const dynamicOpcodesDecoders = [decodePushFromBytecode];
+const dynamicOpcodesDecoders = [decodePushFromBytecode, decodeDupFromBytecode];
 
 export function decodeBytecode(bytecode: string): Opcode[] {
   const bytes = byteStringToNumberArray(bytecode);
@@ -43,10 +43,18 @@ function decodeStaticOpcode(bytesIterator: PeekableIterator<number>): Opcode | u
 }
 
 function decodeDynamicOpcode(bytesIterator: PeekableIterator<number>): Opcode | undefined {
-  const matchedOpcode = dynamicOpcodesDecoders.map(o => o(bytesIterator)).filter(o => !!o);
-  invariant(matchedOpcode.length <= 1, "Dynamic opcode matched more than one time!");
+  let matchedOpcode: Opcode | undefined;
+  for (let i = 0; i < dynamicOpcodesDecoders.length; i++) {
+    const decoder = dynamicOpcodesDecoders[i];
 
-  if (matchedOpcode.length === 0) return;
+    const decodedOpcode = decoder(bytesIterator);
+    if (!decodedOpcode) {
+      continue;
+    }
 
-  return matchedOpcode[0]!;
+    matchedOpcode = decodedOpcode;
+    break;
+  }
+
+  return matchedOpcode;
 }
