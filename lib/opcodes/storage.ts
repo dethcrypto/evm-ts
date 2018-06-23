@@ -1,4 +1,4 @@
-import { IMachineState } from "../BytecodeRunner";
+import { IMachineState } from "../VM";
 import { Opcode } from "./common";
 import { arrayCopy } from "../utils/arrays";
 

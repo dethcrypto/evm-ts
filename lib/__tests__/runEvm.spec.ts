@@ -1,4 +1,4 @@
-import { compareWithReferentialImpl } from "./integration/referential-implementation-utils";
+import { compareWithReferentialImpl } from "./integration/compareWithReferentialImpl";
 
 describe("runEvm", () => {
   describe("should work with", () => {

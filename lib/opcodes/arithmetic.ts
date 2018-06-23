@@ -1,5 +1,5 @@
 import { Opcode } from "./common";
-import { IMachineState } from "../BytecodeRunner";
+import { IMachineState } from "../VM";
 import { MAX_UINT_256 } from "../utils/bytes";
 import { BN } from "bn.js";
 

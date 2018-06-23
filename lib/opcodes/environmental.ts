@@ -1,6 +1,6 @@
 /* tslint:disable */
 import { Opcode } from "./common";
-import { IEnvironment, IMachineState } from "../BytecodeRunner";
+import { IEnvironment, IMachineState } from "../VM";
 
 export class LoadCallData extends Opcode {
   static id = 0x35;

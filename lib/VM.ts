@@ -26,12 +26,19 @@ const initialEnvironment = {
   value: new BN(0),
 };
 
-export class BytecodeRunner {
+export class VM {
+  public readonly environment: IEnvironment;
+
   constructor(
     public program: Opcode[],
-    public environment: IEnvironment = initialEnvironment,
+    environment: Partial<IEnvironment> = initialEnvironment,
     public state = deepCloneState(initialState),
-  ) {}
+  ) {
+    this.environment = {
+      ...initialEnvironment,
+      ...environment,
+    };
+  }
 
   step(): void {
     if (this.state.stopped) {
