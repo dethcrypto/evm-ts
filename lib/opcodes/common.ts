@@ -11,7 +11,7 @@ export abstract class Opcode {
   }
 
   // it should mutate input data. VM makes sure to clone them first
-  abstract run(environment: Environment, state: IMachineState): void;
+  abstract run(state: IMachineState): void;
 }
 
 export class DecodeError extends Error {

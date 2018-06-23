@@ -39,7 +39,7 @@ export class PushOpcode extends Opcode {
     );
   }
 
-  run(_env: Environment, state: IMachineState): void {
+  run(state: IMachineState): void {
     state.stack.push(this.arg);
     state.pc += 1;
   }

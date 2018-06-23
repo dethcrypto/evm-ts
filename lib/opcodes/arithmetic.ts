@@ -6,7 +6,7 @@ export class StopOpcode extends Opcode {
   static id = 0x00;
   static type = "STOP";
 
-  run(_env: Environment, state: IMachineState): void {
+  run(state: IMachineState): void {
     state.stopped = true;
   }
 }
@@ -15,7 +15,7 @@ export class AddOpcode extends Opcode {
   static id = 0x01;
   static type = "ADD";
 
-  run(_env: Environment, state: IMachineState): void {
+  run(state: IMachineState): void {
     const arg1 = state.stack.pop();
     const arg2 = state.stack.pop();
 
@@ -30,7 +30,7 @@ export class MulOpcode extends Opcode {
   static id = 0x02;
   static type: "MUL";
 
-  run(_env: Environment, state: IMachineState): void {
+  run(state: IMachineState): void {
     const arg1 = state.stack.pop();
     const arg2 = state.stack.pop();
 

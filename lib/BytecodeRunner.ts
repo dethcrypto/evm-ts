@@ -42,7 +42,7 @@ export class BytecodeRunner {
 
     // opcodes mutate states so we deep clone it first
     const newState = deepCloneState(this.state);
-    instruction.run(this.environment, newState);
+    instruction.run(newState);
     this.state = newState;
   }
 

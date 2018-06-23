@@ -30,7 +30,7 @@ describe("BytecodeRunner", () => {
     };
 
     class StateMutatingOpcode extends Opcode {
-      run(_environment: Environment, state: IMachineState): void {
+      run(state: IMachineState): void {
         state.stack.push(new BN(6));
         state.pc += 1;
       }
