@@ -8,6 +8,7 @@ export async function compareWithReferentialImpl(code: string): Promise<void> {
   const evmTsResult = runEvm(code);
 
   expect(ethereumJsResult.runState.stack.toString()).to.be.eq(evmTsResult.stack.toString());
+  expect(ethereumJsResult.runState.memory.toString()).to.be.eq(evmTsResult.memory.toString());
 }
 
 async function getEthereumJsResult(code: string): Promise<any> {
@@ -27,5 +28,10 @@ async function getEthereumJsResult(code: string): Promise<any> {
         }
       },
     );
+
+    // useful for debugging purposes
+    // vm.on("step", function(data: any) {
+    //   debugger;
+    // });
   });
 }

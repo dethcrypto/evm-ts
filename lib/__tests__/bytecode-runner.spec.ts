@@ -1,7 +1,7 @@
 import { expect } from "chai";
 import { BN } from "bn.js";
 
-import { BytecodeRunner, Environment, IMachineState } from "../BytecodeRunner";
+import { BytecodeRunner, IMachineState } from "../BytecodeRunner";
 import * as opcodes from "../opcodes";
 import { Opcode } from "../opcodes/common";
 import { Stack } from "../utils/Stack";
@@ -32,6 +32,7 @@ describe("BytecodeRunner", () => {
     class StateMutatingOpcode extends Opcode {
       run(state: IMachineState): void {
         state.stack.push(new BN(6));
+        state.memory.push(1);
         state.pc += 1;
       }
     }
@@ -41,10 +42,15 @@ describe("BytecodeRunner", () => {
 
     const bytecodeRunner = new BytecodeRunner(input, [], initialState);
     expect(() => bytecodeRunner.run()).to.not.throw(Error, expected);
-    expect(initialState).to.deep.eq({ ...initialState });
+    expect(initialState).to.deep.eq({
+      pc: 0,
+      stack: new Stack([new BN(1), new BN(2)]),
+      memory: [],
+      stopped: false,
+    });
     expect(bytecodeRunner.state).to.deep.eq({
-      ...initialState,
       stack: [new BN(1), new BN(2), new BN(6)],
+      memory: [1],
       pc: 1,
       stopped: true,
     });

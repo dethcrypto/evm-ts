@@ -9,6 +9,7 @@ describe("runEvm", () => {
         "7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff01",
       "mul with overflow":
         "7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff02",
+      "mstore simple": "6060600052",
     };
 
     Object.keys(tests).forEach(name => {

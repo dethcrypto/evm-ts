@@ -1,5 +1,5 @@
 import { Opcode } from "./common";
-import { Environment, IMachineState } from "../BytecodeRunner";
+import { IMachineState } from "../BytecodeRunner";
 import { MAX_UINT_256 } from "../utils/bytes";
 
 export class StopOpcode extends Opcode {

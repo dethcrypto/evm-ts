@@ -1,4 +1,4 @@
-import { Environment, IMachineState } from "../BytecodeRunner";
+import { IMachineState } from "../BytecodeRunner";
 
 export abstract class Opcode {
   public id: number;
