@@ -2,7 +2,7 @@ import * as invariant from "invariant";
 import { BN } from "bn.js";
 
 import { Opcode, DecodeError } from "./common";
-import { Environment, IMachineState } from "../BytecodeRunner";
+import { IMachineState } from "../BytecodeRunner";
 import { PeekableIterator } from "../utils/PeekableIterator";
 
 /**
@@ -39,11 +39,8 @@ export class PushOpcode extends Opcode {
     );
   }
 
-  run(_env: Environment, state: IMachineState): IMachineState {
-    return {
-      ...state,
-      stack: [...state.stack, this.arg],
-      pc: state.pc + 1,
-    };
+  run(state: IMachineState): void {
+    state.stack.push(this.arg);
+    state.pc += 1;
   }
 }

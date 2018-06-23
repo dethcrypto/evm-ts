@@ -1,11 +1,23 @@
-import { Environment, IMachineState } from "../BytecodeRunner";
+import { IMachineState } from "../BytecodeRunner";
 import { Opcode } from "./common";
+import { arrayCopy } from "../utils/arrays";
 
+/**
+ * Stores full word in memory.
+ */
 export class MStoreOpcode extends Opcode {
   static id = 0x52;
   static type = "MSTORE";
 
-  run(_env: Environment, _state: IMachineState): IMachineState {
-    throw new Error("Unimplemented!");
+  run(state: IMachineState): void {
+    const address = state.stack.pop().toNumber();
+
+    const value = state.stack.pop();
+    const valueEncoded = value.toArray("be", 32);
+
+    const newMemory = arrayCopy(state.memory, valueEncoded, address);
+
+    state.memory = newMemory;
+    state.pc += 1;
   }
 }
