@@ -1,4 +1,4 @@
-import { IMachineState } from "../BytecodeRunner";
+import { IMachineState, IEnvironment } from "../BytecodeRunner";
 
 export abstract class Opcode {
   public id: number;
@@ -11,7 +11,7 @@ export abstract class Opcode {
   }
 
   // it should mutate input data. VM makes sure to clone them first
-  abstract run(state: IMachineState): void;
+  abstract run(state: IMachineState, env: IEnvironment): void;
 }
 
 export class DecodeError extends Error {

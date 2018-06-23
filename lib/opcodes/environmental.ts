@@ -1,12 +1,12 @@
 /* tslint:disable */
 import { Opcode } from "./common";
-import { Environment, IMachineState } from "../BytecodeRunner";
+import { IEnvironment, IMachineState } from "../BytecodeRunner";
 
 export class LoadCallData extends Opcode {
   static id = 0x35;
   static type = "CALLDATALOAD";
 
-  run(_state: IMachineState): IMachineState {
+  run(_state: IMachineState): void {
     // const readIndex = getIndex(state.stack, -1);
     // const data = bitsToNumber(environment.slice(readIndex, readIndex + 32));
 
@@ -16,5 +16,15 @@ export class LoadCallData extends Opcode {
     // };
 
     throw new Error("Not implemented yet!");
+  }
+}
+
+export class CallValueOpcode extends Opcode {
+  static id = 0x34;
+  static type = "CALLVALUE";
+
+  run(state: IMachineState, env: IEnvironment): void {
+    state.stack.push(env.value);
+    state.pc += 1;
   }
 }

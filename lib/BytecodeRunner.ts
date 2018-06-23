@@ -2,6 +2,7 @@ import { BN } from "bn.js";
 
 import { Opcode } from "./opcodes/common";
 import { Stack } from "./utils/Stack";
+import { DeepReadonly } from "../@types/std";
 
 export interface IMachineState {
   pc: number;
@@ -9,7 +10,10 @@ export interface IMachineState {
   memory: number[];
   stopped: boolean;
 }
-export type Environment = boolean[];
+
+export type IEnvironment = DeepReadonly<{
+  value: BN;
+}>;
 
 const initialState: IMachineState = {
   pc: 0,
@@ -18,10 +22,14 @@ const initialState: IMachineState = {
   stopped: false,
 };
 
+const initialEnvironment = {
+  value: new BN(0),
+};
+
 export class BytecodeRunner {
   constructor(
     public program: Opcode[],
-    public environment: Environment = [],
+    public environment: IEnvironment = initialEnvironment,
     public state = deepCloneState(initialState),
   ) {}
 
@@ -42,7 +50,7 @@ export class BytecodeRunner {
 
     // opcodes mutate states so we deep clone it first
     const newState = deepCloneState(this.state);
-    instruction.run(newState);
+    instruction.run(newState, this.environment);
     this.state = newState;
   }
 

@@ -17,6 +17,9 @@ describe("runEvm", () => {
 
     it("mstore simple", () => compareWithReferentialImpl("6060600052"));
 
-    it.skip("mstore with more than 1 word size data");
+    it("mstore with more than 1 word size data", () =>
+      compareWithReferentialImpl("7f4e616d655265670000000000000000f0000b0000000000000000000000000000606052"));
+
+    it("iszero and callvalue should work", () => compareWithReferentialImpl("60606040523415600e"));
   });
 });

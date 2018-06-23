@@ -1,3 +1,5 @@
 node_modules
 .vscode
 package.json
+.nyc_output
+coverage
