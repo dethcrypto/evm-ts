@@ -57,7 +57,11 @@ export class VM {
 
     // opcodes mutate states so we deep clone it first
     const newState = deepCloneState(this.state);
-    instruction.run(newState, this.environment);
+    try {
+      instruction.run(newState, this.environment);
+    } catch (e) {
+      throw new Error(`Error while running bytecode at ${this.state.pc}: ${e.message}`);
+    }
     this.state = newState;
   }
 
