@@ -1,8 +1,8 @@
 import { BN } from "bn.js";
 
-import { Opcode } from "./opcodes/common";
 import { Stack } from "./utils/Stack";
 import { DeepReadonly } from "../@types/std";
+import { IProgram } from "./decodeBytecode";
 
 export interface IMachineState {
   pc: number;
@@ -30,7 +30,7 @@ export class VM {
   public readonly environment: IEnvironment;
 
   constructor(
-    public program: Opcode[],
+    public program: IProgram,
     environment: Partial<IEnvironment> = initialEnvironment,
     public state = deepCloneState(initialState),
   ) {
@@ -45,15 +45,16 @@ export class VM {
       throw new Error("Machine stopped!");
     }
 
-    const instruction = this.program[this.state.pc];
+    const instructionIndex = this.program.sourceMap[this.state.pc];
 
-    if (!instruction) {
+    if (instructionIndex === undefined) {
       this.state = {
         ...this.state,
         stopped: true,
       };
       return;
     }
+    const instruction = this.program.opcodes[instructionIndex];
 
     // opcodes mutate states so we deep clone it first
     const newState = deepCloneState(this.state);

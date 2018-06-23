@@ -41,6 +41,6 @@ export class PushOpcode extends Opcode {
 
   run(state: IMachineState): void {
     state.stack.push(this.arg);
-    state.pc += 1;
+    state.pc += this.byteNumber + 1;
   }
 }

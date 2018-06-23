@@ -5,12 +5,16 @@ import { VM, IMachineState, IEnvironment } from "../VM";
 import * as opcodes from "../opcodes";
 import { Opcode } from "../opcodes/common";
 import { Stack } from "../utils/Stack";
+import { IProgram } from "../decodeBytecode";
 
-describe("BytecodeRunner", () => {
+describe("VM", () => {
   it("should run simple program", () => {
-    const input = [new opcodes.PushOpcode(1, new BN(1)), new opcodes.PushOpcode(1, new BN(2)), new opcodes.AddOpcode()];
+    const input: IProgram = {
+      opcodes: [new opcodes.PushOpcode(1, new BN(1)), new opcodes.PushOpcode(1, new BN(2)), new opcodes.AddOpcode()],
+      sourceMap: { 0: 0, 2: 1, 4: 2 },
+    };
     const expectedState = {
-      pc: 3,
+      pc: 5,
       stopped: true,
       stack: [new BN(3)],
       memory: [],
@@ -39,7 +43,7 @@ describe("BytecodeRunner", () => {
       }
     }
 
-    const input = [new StateMutatingOpcode()];
+    const input: IProgram = { opcodes: [new StateMutatingOpcode()], sourceMap: { 0: 0 } };
     const expected = "Cannot add property 0, object is not extensible";
 
     const bytecodeRunner = new VM(input, initialEnv, initialState);
