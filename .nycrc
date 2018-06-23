@@ -7,7 +7,8 @@
     "lib/**/*.ts"
   ],
   "exclude": [
-    "lib/**/*.spec.ts"
+    "lib/**/*.spec.ts",
+    "lib/**/__tests__/**"
   ],
   "extension": [
     ".ts"
