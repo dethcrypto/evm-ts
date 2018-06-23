@@ -42,7 +42,7 @@ export class MulOpcode extends Opcode {
   }
 }
 
-export class NotOpcode extends Opcode {
+export class IsZeroOpcode extends Opcode {
   static id = 0x15;
   static type: "ISZERO";
 

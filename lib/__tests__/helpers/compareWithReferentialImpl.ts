@@ -4,15 +4,15 @@ import { VM, IEnvironment } from "../../VM";
 import { IMachineState } from "../../VM";
 import { decodeBytecode } from "../../decodeBytecode";
 
-export async function compareWithReferentialImpl(code: string): Promise<void> {
-  const ethereumJsResult = await getEthereumJsResult(code);
-  const evmTsResult = runEvm(code);
+export async function compareWithReferentialImpl(code: string, env?: Partial<IEnvironment>): Promise<void> {
+  const ethereumJsResult = await getEthereumJsResult(code, env);
+  const evmTsResult = runEvm(code, env);
 
   expect(evmTsResult.stack.toString()).to.be.eq(ethereumJsResult.runState.stack.toString());
   expect(evmTsResult.memory.toString()).to.be.eq(ethereumJsResult.runState.memory.toString());
 }
 
-async function getEthereumJsResult(code: string, env?: IEnvironment): Promise<any> {
+async function getEthereumJsResult(code: string, env?: Partial<IEnvironment>): Promise<any> {
   const options = {
     code: Buffer.from(code, "hex"),
     gasLimit: Buffer.from("ffffffff", "hex"),
