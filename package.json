@@ -12,8 +12,11 @@
     "lint": "yarn format && yarn tslint && yarn tsc",
     "lint:fix": "yarn format:fix && yarn tslint:fix && yarn tsc",
     "test": "yarn lint && yarn test:mocha",
+    "test:coverage": "yarn lint && yarn test:mocha:coverage",
     "test:fix": "yarn lint:fix && yarn test:mocha",
-    "test:mocha": "NODE_ENV=test mocha --require ts-node/register '**/*.spec.ts'"
+    "test:mocha": "NODE_ENV=test mocha --require ts-node/register '**/*.spec.ts'",
+    "test:mocha:coverage": "NODE_ENV=test nyc mocha --require ts-node/register '**/*.spec.ts'",
+    "coveralls": "nyc report --reporter=text-lcov | coveralls"
   },
   "dependencies": {
     "bn.js": "^4.11.8",
@@ -32,8 +35,10 @@
     "@types/mocha": "^5.2.0",
     "@types/node": "^10.3.4",
     "chai": "^4.1.0",
+    "coveralls": "^3.0.1",
     "ethereumjs-vm": "^2.3.5",
     "mocha": "^5.2.0",
+    "nyc": "^12.0.2",
     "ts-node": "^6.0.5",
     "typescript": "^2.9.1"
   }
