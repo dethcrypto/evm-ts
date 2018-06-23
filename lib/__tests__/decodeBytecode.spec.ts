@@ -4,7 +4,7 @@ import { decodeBytecode } from "../decodeBytecode";
 import { PushOpcode, AddOpcode } from "../opcodes";
 import { BN } from "bn.js";
 
-describe("BytecodeDecoder", () => {
+describe("decodeBytecode", () => {
   it("should decode push operation", () => {
     const input = "7f4e616d6552656700000000000000000000000000000000000000000000000000";
     const expected = [

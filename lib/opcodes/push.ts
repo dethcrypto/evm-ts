@@ -2,7 +2,7 @@ import * as invariant from "invariant";
 import { BN } from "bn.js";
 
 import { Opcode, DecodeError } from "./common";
-import { IMachineState } from "../BytecodeRunner";
+import { IMachineState } from "../VM";
 import { PeekableIterator } from "../utils/PeekableIterator";
 
 /**

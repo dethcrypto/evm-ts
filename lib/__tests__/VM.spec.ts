@@ -1,7 +1,7 @@
 import { expect } from "chai";
 import { BN } from "bn.js";
 
-import { BytecodeRunner, IMachineState, IEnvironment } from "../BytecodeRunner";
+import { VM, IMachineState, IEnvironment } from "../VM";
 import * as opcodes from "../opcodes";
 import { Opcode } from "../opcodes/common";
 import { Stack } from "../utils/Stack";
@@ -16,7 +16,7 @@ describe("BytecodeRunner", () => {
       memory: [],
     };
 
-    const bytecodeRunner = new BytecodeRunner(input);
+    const bytecodeRunner = new VM(input);
     bytecodeRunner.run();
     expect(bytecodeRunner.state).to.deep.eq(expectedState);
   });
@@ -42,7 +42,7 @@ describe("BytecodeRunner", () => {
     const input = [new StateMutatingOpcode()];
     const expected = "Cannot add property 0, object is not extensible";
 
-    const bytecodeRunner = new BytecodeRunner(input, initialEnv, initialState);
+    const bytecodeRunner = new VM(input, initialEnv, initialState);
     expect(() => bytecodeRunner.run()).to.not.throw(Error, expected);
     expect(initialState).to.deep.eq({
       pc: 0,

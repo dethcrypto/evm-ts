@@ -1,5 +1,5 @@
 import { Opcode } from "./common";
-import { IMachineState } from "../BytecodeRunner";
+import { IMachineState } from "../VM";
 import { MAX_UINT_256 } from "../utils/bytes";
 import { BN } from "bn.js";
 
@@ -42,7 +42,7 @@ export class MulOpcode extends Opcode {
   }
 }
 
-export class NotOpcode extends Opcode {
+export class IsZeroOpcode extends Opcode {
   static id = 0x15;
   static type: "ISZERO";
 
