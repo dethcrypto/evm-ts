@@ -3,15 +3,6 @@ import { IMachineState } from "../VM";
 import { MAX_UINT_256 } from "../utils/bytes";
 import { BN } from "bn.js";
 
-export class StopOpcode extends Opcode {
-  static id = 0x00;
-  static type = "STOP";
-
-  run(state: IMachineState): void {
-    state.stopped = true;
-  }
-}
-
 export class AddOpcode extends Opcode {
   static id = 0x01;
   static type = "ADD";

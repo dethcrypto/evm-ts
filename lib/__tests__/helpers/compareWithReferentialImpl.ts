@@ -1,40 +1,24 @@
 import { expect } from "chai";
-import * as VMJS from "ethereumjs-vm";
+import { EVMJS } from "./EVMJS";
+
 import { VM, IEnvironment } from "../../VM";
 import { IMachineState } from "../../VM";
 import { decodeBytecode } from "../../decodeBytecode";
 
-export async function compareWithReferentialImpl(code: string, env?: Partial<IEnvironment>): Promise<void> {
-  const ethereumJsResult = await getEthereumJsResult(code, env);
-  const evmTsResult = runEvm(code, env);
+export async function compareWithReferentialImpl(code: string, env?: Partial<IEnvironment>): Promise<void> {}
 
-  expect(evmTsResult.stack.toString()).to.be.eq(ethereumJsResult.runState.stack.toString());
-  expect(evmTsResult.memory.toString()).to.be.eq(ethereumJsResult.runState.memory.toString());
-}
+export async function compareWithReferentialImpl2(codes: string[], env?: Partial<IEnvironment>): Promise<void> {
+  const evmJs = new EVMJS();
+  await evmJs.setup();
+  // const evmTs = new EvmJs()
 
-async function getEthereumJsResult(code: string, env?: Partial<IEnvironment>): Promise<any> {
-  const options = {
-    code: Buffer.from(code, "hex"),
-    gasLimit: Buffer.from("ffffffff", "hex"),
-    value: env && env.value,
-  };
+  for (const code of codes) {
+    const ethereumJsResult = await evmJs.runTx(code, env);
+    const evmTsResult = runEvm(code, env);
 
-  return new Promise<any>((resolve, reject) => {
-    const vm = new VMJS();
-
-    vm.runCode(options, (err: any, results: any) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve(results);
-      }
-    });
-
-    // useful for debugging purposes
-    // vm.on("step", function(data: any) {
-    //   debugger;
-    // });
-  });
+    expect(evmTsResult.stack.toString()).to.be.eq(ethereumJsResult.runState.stack.toString());
+    expect(evmTsResult.memory.toString()).to.be.eq(ethereumJsResult.runState.memory.toString());
+  }
 }
 
 export function runEvm(bytecode: string, env?: Partial<IEnvironment>): IMachineState {
