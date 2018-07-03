@@ -1,2 +1,4 @@
 .nyc_output
 coverage
+lib/__tests__/contracts/*.bin
+lib/__tests__/contracts/*.abi

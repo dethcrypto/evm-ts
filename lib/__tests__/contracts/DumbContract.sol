@@ -1,6 +1,6 @@
-pragma solidity ^0.4.24;
+pragma solidity ^0.4.17;
 
-contract C {
+contract DumbContract {
     uint256 a;
     function C() {
       a = 666;
