@@ -1,4 +1,4 @@
-import { Opcode } from "./common";
+import { Opcode, notImplementedError } from "./common";
 import { IMachineState } from "../VM";
 import { MAX_UINT_256 } from "../utils/bytes";
 import { BN } from "bn.js";
@@ -33,6 +33,24 @@ export class MulOpcode extends Opcode {
   }
 }
 
+export class SubOpcode extends Opcode {
+  static id = 0x03;
+  static type: "SUB";
+
+  run(state: IMachineState): void {
+    notImplementedError();
+  }
+}
+
+export class DivOpcode extends Opcode {
+  static id = 0x04;
+  static type: "DIV";
+
+  run(state: IMachineState): void {
+    notImplementedError();
+  }
+}
+
 export class IsZeroOpcode extends Opcode {
   static id = 0x15;
   static type: "ISZERO";
@@ -44,5 +62,23 @@ export class IsZeroOpcode extends Opcode {
 
     state.pc += 1;
     state.stack.push(result);
+  }
+}
+
+export class AndOpcode extends Opcode {
+  static id = 0x16;
+  static type: "AND";
+
+  run(state: IMachineState): void {
+    notImplementedError();
+  }
+}
+
+export class EqOpcode extends Opcode {
+  static id = 0x14;
+  static type: "EQ";
+
+  run(state: IMachineState): void {
+    notImplementedError();
   }
 }

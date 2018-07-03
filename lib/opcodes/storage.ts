@@ -1,14 +1,26 @@
 import { IMachineState } from "../VM";
-import { Opcode } from "./common";
+import { Opcode, notImplementedError } from "./common";
 
 /**
- * Stores full word in memory.
+ * Stores full word in storage.
  */
 export class SStoreOpcode extends Opcode {
   static id = 0x55;
   static type = "SSTORE";
 
   run(state: IMachineState): void {
-    throw new Error("Not implemented yet");
+    notImplementedError();
+  }
+}
+
+/**
+ * Loades full word from storage.
+ */
+export class SLoadOpcode extends Opcode {
+  static id = 0x54;
+  static type = "SLOAD";
+
+  run(state: IMachineState): void {
+    notImplementedError();
   }
 }

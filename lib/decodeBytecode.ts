@@ -6,6 +6,8 @@ import { PeekableIterator } from "./utils/PeekableIterator";
 import { decodePushFromBytecode } from "./opcodes/index";
 import { byteStringToNumberArray } from "./utils/bytes";
 import { decodeDupFromBytecode } from "./opcodes/dup";
+import { decodeSwapFromBytecode } from "./opcodes/swap";
+import { decodeLogFromBytecode } from "./opcodes/log";
 
 // sourceMap is tmp concept. We "parse" whole bytecode first and later we need it to associate PC with instruction
 export interface IProgram {
@@ -15,7 +17,12 @@ export interface IProgram {
 
 const opcodesById: Dictionary<new () => Opcode> = keyBy(opcodes as any, "id");
 
-const dynamicOpcodesDecoders = [decodePushFromBytecode, decodeDupFromBytecode];
+const dynamicOpcodesDecoders = [
+  decodePushFromBytecode,
+  decodeDupFromBytecode,
+  decodeSwapFromBytecode,
+  decodeLogFromBytecode,
+];
 
 export function decodeBytecode(bytecode: string): IProgram {
   const sourceMap: Dictionary<number> = {};
@@ -27,8 +34,11 @@ export function decodeBytecode(bytecode: string): IProgram {
   while (!bytesIterator.done()) {
     const startingIndex = bytesIterator.index;
     const opcodePos = opcodes.length;
-    opcodes.push(decodeOpcode(bytesIterator));
+    const decodedOpcode = decodeOpcode(bytesIterator);
+    opcodes.push(decodedOpcode);
     sourceMap[startingIndex] = opcodePos;
+
+    console.log(`${startingIndex} -> ${decodedOpcode.type}`);
   }
 
   return {

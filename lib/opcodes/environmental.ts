@@ -1,5 +1,5 @@
 /* tslint:disable */
-import { Opcode } from "./common";
+import { Opcode, notImplementedError } from "./common";
 import { IEnvironment, IMachineState } from "../VM";
 
 export class LoadCallData extends Opcode {
@@ -15,7 +15,7 @@ export class LoadCallData extends Opcode {
     //   stack: [...state.stack.slice(0, -1), data],
     // };
 
-    throw new Error("Not implemented yet!");
+    notImplementedError()
   }
 }
 
@@ -26,5 +26,14 @@ export class CallValueOpcode extends Opcode {
   run(state: IMachineState, env: IEnvironment): void {
     state.stack.push(env.value);
     state.pc += 1;
+  }
+}
+
+export class CallDataSizeOpcode extends Opcode {
+  static id = 0x36;
+  static type = "CALLDATASIZE";
+
+  run(state: IMachineState, env: IEnvironment): void {
+    notImplementedError()
   }
 }

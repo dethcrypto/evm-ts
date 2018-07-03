@@ -32,11 +32,6 @@ export function decodePushFromBytecode(bytecodeIterator: PeekableIterator<number
 export class PushOpcode extends Opcode {
   constructor(public byteNumber: number, public arg: BN) {
     super(baseId + byteNumber, `${baseType}${byteNumber}`);
-
-    invariant(
-      byteNumber === arg.toArray().length,
-      `byte number (${byteNumber}) doesn't match args bytes: ${arg.toString()}`,
-    );
   }
 
   run(state: IMachineState): void {
