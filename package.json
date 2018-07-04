@@ -31,7 +31,6 @@
   "devDependencies": {
     "@types/chai": "^4.0.1",
     "@types/deep-freeze": "^0.1.1",
-    "@types/ethereumjs-util": "^5.2.0",
     "@types/invariant": "^2.2.28",
     "@types/lodash": "^4.14.109",
     "@types/mocha": "^5.2.0",

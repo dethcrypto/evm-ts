@@ -2,17 +2,35 @@ import { BN } from "bn.js";
 
 import { Stack } from "./utils/Stack";
 import { DeepReadonly } from "../@types/std";
-import { IProgram } from "./decodeBytecode";
+import { decodeOpcode } from "./decodeBytecode";
+import { PeekableIterator } from "./utils/PeekableIterator";
+
+/**
+ * Blockchain class:
+ *  - globalstate:
+ *      - address => (value, code, storage)
+ *  - runTx { to?, value, data? } "to" or "data" has to be provided
+ * VM class becomes a function?:
+ *  - CODE becomes part of environment - immutable [DONE]
+ *  - calls EVMJS's run code, implemented by adding optional return? to state  [DONE]
+ * -
+ *  - RETURN will return from getCode [DONE]
+ *  -
+ *
+ */
 
 export interface IMachineState {
   pc: number;
   stack: Stack<BN>;
   memory: number[];
   stopped: boolean;
+  return?: ReadonlyArray<number>;
 }
 
 export type IEnvironment = DeepReadonly<{
   value: BN;
+  data: number[];
+  code: number[];
 }>;
 
 const initialState: IMachineState = {
@@ -22,54 +40,62 @@ const initialState: IMachineState = {
   stopped: false,
 };
 
-const initialEnvironment = {
+const initialEnvironment: IEnvironment = {
   value: new BN(0),
+  code: [],
+  data: [],
 };
 
 export class VM {
-  public readonly environment: IEnvironment;
+  private environment: IEnvironment = initialEnvironment;
+  private codeIterator?: PeekableIterator<number>;
 
-  constructor(
-    public program: IProgram,
-    environment: Partial<IEnvironment> = initialEnvironment,
-    public state = deepCloneState(initialState),
-  ) {
-    this.environment = {
-      ...initialEnvironment,
-      ...environment,
-    };
-  }
+  constructor(public state = deepCloneState(initialState)) {}
 
-  step(): void {
+  private step(): void {
     if (this.state.stopped) {
       throw new Error("Machine stopped!");
     }
+    if (!this.environment.code || !this.codeIterator) {
+      throw new Error("No code to execute");
+    }
+    if (!this.environment) {
+      throw new Error("No environment to execute");
+    }
 
-    const instructionIndex = this.program.sourceMap[this.state.pc];
+    const newState = deepCloneState(this.state);
 
-    if (instructionIndex === undefined) {
-      this.state = {
-        ...this.state,
-        stopped: true,
-      };
+    if (this.state.pc >= this.environment.code.length) {
+      newState.stopped = true;
+      this.state = newState;
       return;
     }
-    const instruction = this.program.opcodes[instructionIndex];
+
+    this.codeIterator.index = this.state.pc;
+    const opcode = decodeOpcode(this.codeIterator);
 
     // opcodes mutate states so we deep clone it first
-    const newState = deepCloneState(this.state);
     try {
-      instruction.run(newState, this.environment);
+      opcode.run(newState, this.environment);
     } catch (e) {
-      throw new Error(`Error while running bytecode at ${this.state.pc}: ${e.message}`);
+      throw new Error(`Error while running ${opcode.type} at position ${this.state.pc}: ${e.message}`);
     }
     this.state = newState;
   }
 
-  run(): void {
+  runCode(environment: Partial<IEnvironment> = initialEnvironment): { state: IMachineState } {
+    this.environment = { ...initialEnvironment, ...environment, value: environment.value || initialEnvironment.value };
+    this.codeIterator = new PeekableIterator(this.environment.code);
+    this.state.stopped = false;
+    this.state.pc = 0;
+
     while (!this.state.stopped) {
       this.step();
     }
+
+    return {
+      state: this.state,
+    };
   }
 }
 

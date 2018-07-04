@@ -82,12 +82,6 @@
     lodash "^4.17.5"
     to-fast-properties "^2.0.0"
 
-"@types/bn.js@*":
-  version "4.11.1"
-  resolved "https://registry.yarnpkg.com/@types/bn.js/-/bn.js-4.11.1.tgz#6fd07b93490ecf0f3501a31ea9cfd330885b10fa"
-  dependencies:
-    "@types/node" "*"
-
 "@types/chai@^4.0.1":
   version "4.0.1"
   resolved "https://registry.yarnpkg.com/@types/chai/-/chai-4.0.1.tgz#37fea779617cfec3fd2b19a0247e8bbdd5133bf6"
@@ -95,13 +89,6 @@
 "@types/deep-freeze@^0.1.1":
   version "0.1.1"
   resolved "https://registry.yarnpkg.com/@types/deep-freeze/-/deep-freeze-0.1.1.tgz#0e1ee6ceee06f51baeb663deec0bb7780bd72827"
-
-"@types/ethereumjs-util@^5.2.0":
-  version "5.2.0"
-  resolved "https://registry.yarnpkg.com/@types/ethereumjs-util/-/ethereumjs-util-5.2.0.tgz#f49fe8114789ec0871721392c09318c3eb56671b"
-  dependencies:
-    "@types/bn.js" "*"
-    "@types/node" "*"
 
 "@types/invariant@^2.2.28":
   version "2.2.28"
@@ -114,10 +101,6 @@
 "@types/mocha@^5.2.0":
   version "5.2.1"
   resolved "https://registry.yarnpkg.com/@types/mocha/-/mocha-5.2.1.tgz#465450aaf5cec6f7d35523748c6cc89a5e222dc5"
-
-"@types/node@*":
-  version "10.5.1"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-10.5.1.tgz#d578446f4abff5c0b49ade9b4e5274f6badaadfc"
 
 "@types/node@^10.3.4":
   version "10.3.4"

@@ -16,13 +16,14 @@ export class EVMJS {
   constructor() {
     this.vm = new VMJS({ state: this.stateTrie });
 
-    this.vm.on("step", function(data: any) {
-      console.log(`${data.pc} -> ${data.opcode.name}`);
-    });
+    // useful for debugging purposes
+    // this.vm.on("step", function(data: any) {
+    //   console.log(`${data.pc} -> ${data.opcode.name}`);
+    // });
   }
 
-  public async setup() {
-    return new Promise(res => {
+  public async setup(): Promise<void> {
+    return new Promise<void>(res => {
       const publicKeyBuf = Buffer.from(keyPair.publicKey, "hex");
       const address = utils.pubToAddress(publicKeyBuf, true);
 
@@ -54,7 +55,7 @@ export class EVMJS {
 
     return new Promise<any>(async (resolve, reject) => {
       try {
-        const ethereumJsResult = await this.vm.runTx(
+        await this.vm.runTx(
           {
             tx: tx,
           },
@@ -65,6 +66,7 @@ export class EVMJS {
             }
 
             if (results.createdAddress) {
+              // tslint:disable-next-line
               this.lastDeployedAddress = "0x" + results.createdAddress.toString("hex");
             }
 

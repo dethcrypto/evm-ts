@@ -1,5 +1,6 @@
 import { Opcode, notImplementedError } from "./common";
 import { IMachineState } from "../VM";
+import { BN } from "bn.js";
 
 export class StopOpcode extends Opcode {
   static id = 0x00;
@@ -25,8 +26,13 @@ export class ReturnOpcode extends Opcode {
   static type = "RETURN";
 
   run(state: IMachineState): void {
+    const offset = state.stack.pop().toNumber();
+    const size = state.stack.pop().toNumber();
+
+    const ret = new BN(state.memory.slice(offset, size));
+
+    state.return = ret.toArray();
     state.stopped = true;
-    // @todo: proper impl
   }
 }
 
@@ -34,7 +40,7 @@ export class BlockHashOpcode extends Opcode {
   static id = 0x40;
   static type = "BLOCKHASH";
 
-  run(state: IMachineState): void {
+  run(_state: IMachineState): void {
     notImplementedError();
   }
 }
@@ -43,48 +49,7 @@ export class Sha3Opcode extends Opcode {
   static id = 0x20;
   static type = "SHA3";
 
-  run(state: IMachineState): void {
-    notImplementedError();
-  }
-}
-
-export class UnknownOpcode extends Opcode {
-  static id = 0xd5;
-  static type = "UNKNOWN";
-
-  run(state: IMachineState): void {
-    notImplementedError();
-  }
-}
-export class Unknown2Opcode extends Opcode {
-  static id = 0xf6;
-  static type = "UNKNOWN";
-
-  run(state: IMachineState): void {
-    notImplementedError();
-  }
-}
-export class Unknown3Opcode extends Opcode {
-  static id = 0xce;
-  static type = "UNKNOWN";
-
-  run(state: IMachineState): void {
-    notImplementedError();
-  }
-}
-export class Unknown4Opcode extends Opcode {
-  static id = 0xf;
-  static type = "UNKNOWN";
-
-  run(state: IMachineState): void {
-    notImplementedError();
-  }
-}
-export class Unknown5Opcode extends Opcode {
-  static id = 0x2e;
-  static type = "UNKNOWN";
-
-  run(state: IMachineState): void {
+  run(_state: IMachineState): void {
     notImplementedError();
   }
 }

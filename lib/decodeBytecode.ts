@@ -1,21 +1,15 @@
-import { Dictionary, keyBy } from "lodash";
+import { keyBy } from "lodash";
 
 import { Opcode, UnknownOpcodeError } from "./opcodes/common";
 import * as opcodes from "./opcodes/index";
 import { PeekableIterator } from "./utils/PeekableIterator";
 import { decodePushFromBytecode } from "./opcodes/index";
-import { byteStringToNumberArray } from "./utils/bytes";
 import { decodeDupFromBytecode } from "./opcodes/dup";
 import { decodeSwapFromBytecode } from "./opcodes/swap";
 import { decodeLogFromBytecode } from "./opcodes/log";
+import { TDictionary } from "../@types/std";
 
-// sourceMap is tmp concept. We "parse" whole bytecode first and later we need it to associate PC with instruction
-export interface IProgram {
-  opcodes: Opcode[];
-  sourceMap: Dictionary<number>; // pc -> opcode array
-}
-
-const opcodesById: Dictionary<new () => Opcode> = keyBy(opcodes as any, "id");
+const opcodesById: TDictionary<new () => Opcode> = keyBy(opcodes as any, "id");
 
 const dynamicOpcodesDecoders = [
   decodePushFromBytecode,
@@ -24,30 +18,7 @@ const dynamicOpcodesDecoders = [
   decodeLogFromBytecode,
 ];
 
-export function decodeBytecode(bytecode: string): IProgram {
-  const sourceMap: Dictionary<number> = {};
-  const bytes = byteStringToNumberArray(bytecode);
-
-  const bytesIterator = new PeekableIterator(bytes);
-
-  let opcodes: Opcode[] = [];
-  while (!bytesIterator.done()) {
-    const startingIndex = bytesIterator.index;
-    const opcodePos = opcodes.length;
-    const decodedOpcode = decodeOpcode(bytesIterator);
-    opcodes.push(decodedOpcode);
-    sourceMap[startingIndex] = opcodePos;
-
-    console.log(`${startingIndex} -> ${decodedOpcode.type}`);
-  }
-
-  return {
-    opcodes,
-    sourceMap,
-  };
-}
-
-function decodeOpcode(bytesIterator: PeekableIterator<number>): Opcode {
+export function decodeOpcode(bytesIterator: PeekableIterator<number>): Opcode {
   const opcode = decodeStaticOpcode(bytesIterator) || decodeDynamicOpcode(bytesIterator);
 
   if (!opcode) throw new UnknownOpcodeError(bytesIterator.index, bytesIterator.peek());

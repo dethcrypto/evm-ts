@@ -20,7 +20,7 @@ export class AddOpcode extends Opcode {
 
 export class MulOpcode extends Opcode {
   static id = 0x02;
-  static type: "MUL";
+  static type = "MUL";
 
   run(state: IMachineState): void {
     const arg1 = state.stack.pop();
@@ -35,25 +35,25 @@ export class MulOpcode extends Opcode {
 
 export class SubOpcode extends Opcode {
   static id = 0x03;
-  static type: "SUB";
+  static type = "SUB";
 
-  run(state: IMachineState): void {
+  run(_state: IMachineState): void {
     notImplementedError();
   }
 }
 
 export class DivOpcode extends Opcode {
   static id = 0x04;
-  static type: "DIV";
+  static type = "DIV";
 
-  run(state: IMachineState): void {
+  run(_state: IMachineState): void {
     notImplementedError();
   }
 }
 
 export class IsZeroOpcode extends Opcode {
   static id = 0x15;
-  static type: "ISZERO";
+  static type = "ISZERO";
 
   run(state: IMachineState): void {
     const arg1 = state.stack.pop();
@@ -67,18 +67,18 @@ export class IsZeroOpcode extends Opcode {
 
 export class AndOpcode extends Opcode {
   static id = 0x16;
-  static type: "AND";
+  static type = "AND";
 
-  run(state: IMachineState): void {
+  run(_state: IMachineState): void {
     notImplementedError();
   }
 }
 
 export class EqOpcode extends Opcode {
   static id = 0x14;
-  static type: "EQ";
+  static type = "EQ";
 
-  run(state: IMachineState): void {
+  run(_state: IMachineState): void {
     notImplementedError();
   }
 }

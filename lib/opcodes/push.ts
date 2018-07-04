@@ -1,4 +1,3 @@
-import * as invariant from "invariant";
 import { BN } from "bn.js";
 
 import { Opcode, DecodeError } from "./common";

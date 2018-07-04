@@ -1,6 +1,7 @@
 /* tslint:disable */
 import { Opcode, notImplementedError } from "./common";
 import { IEnvironment, IMachineState } from "../VM";
+import { BN } from "bn.js";
 
 export class LoadCallData extends Opcode {
   static id = 0x35;
@@ -15,7 +16,7 @@ export class LoadCallData extends Opcode {
     //   stack: [...state.stack.slice(0, -1), data],
     // };
 
-    notImplementedError()
+    notImplementedError();
   }
 }
 
@@ -34,6 +35,9 @@ export class CallDataSizeOpcode extends Opcode {
   static type = "CALLDATASIZE";
 
   run(state: IMachineState, env: IEnvironment): void {
-    notImplementedError()
+    const size = new BN(env.data.length);
+
+    state.stack.push(size);
+    state.pc += 1;
   }
 }

@@ -8,7 +8,7 @@ export class SStoreOpcode extends Opcode {
   static id = 0x55;
   static type = "SSTORE";
 
-  run(state: IMachineState): void {
+  run(_state: IMachineState): void {
     notImplementedError();
   }
 }
@@ -20,7 +20,7 @@ export class SLoadOpcode extends Opcode {
   static id = 0x54;
   static type = "SLOAD";
 
-  run(state: IMachineState): void {
+  run(_state: IMachineState): void {
     notImplementedError();
   }
 }

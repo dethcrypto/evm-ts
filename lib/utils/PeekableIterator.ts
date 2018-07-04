@@ -5,7 +5,7 @@
  */
 export class PeekableIterator<T> {
   public index = 0;
-  constructor(private array: Array<T>) {}
+  constructor(private array: ReadonlyArray<T>) {}
 
   public peek(): T {
     if (this.index < 0 || this.index >= this.array.length) {

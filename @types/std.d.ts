@@ -5,3 +5,5 @@ export type DeepReadonly<T> = {
     ? ReadonlyArray<DeepReadonly<U>>
     : T[P] extends BN ? BN : DeepReadonly<T[P]>
 };
+
+export type TDictionary<T> = { [key: string]: T };

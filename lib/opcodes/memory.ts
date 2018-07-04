@@ -1,4 +1,4 @@
-import { IMachineState } from "../VM";
+import { IMachineState, IEnvironment } from "../VM";
 import { Opcode, notImplementedError } from "./common";
 import { arrayCopy } from "../utils/arrays";
 
@@ -13,7 +13,7 @@ export class MStoreOpcode extends Opcode {
     const address = state.stack.pop().toNumber();
 
     const value = state.stack.pop();
-    const valueEncoded = value.toArray("be", 32);
+    const valueEncoded = value.toArray("be", 32); // @todo this will probably overflow
 
     const newMemory = arrayCopy(state.memory, valueEncoded, address);
 
@@ -29,7 +29,7 @@ export class MLoadOpcode extends Opcode {
   static id = 0x51;
   static type = "MLOAD";
 
-  run(state: IMachineState): void {
+  run(_state: IMachineState): void {
     notImplementedError();
   }
 }
@@ -41,7 +41,16 @@ export class CodeCopyOpcode extends Opcode {
   static id = 0x39;
   static type = "CODECOPY";
 
-  run(state: IMachineState): void {
-    notImplementedError()
+  run(state: IMachineState, env: IEnvironment): void {
+    const memOffset = state.stack.pop().toNumber();
+    const codeOffset = state.stack.pop().toNumber();
+    const length = state.stack.pop().toNumber();
+
+    const codeToCopy = env.code.slice(codeOffset, codeOffset + length);
+
+    const newMemory = arrayCopy(state.memory, codeToCopy, memOffset);
+
+    state.memory = newMemory;
+    state.pc += 1;
   }
 }

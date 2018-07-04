@@ -1,7 +1,4 @@
-import * as invariant from "invariant";
-import { BN } from "bn.js";
-
-import { Opcode, DecodeError, notImplementedError } from "./common";
+import { Opcode, notImplementedError } from "./common";
 import { IMachineState } from "../VM";
 import { PeekableIterator } from "../utils/PeekableIterator";
 
@@ -29,7 +26,7 @@ export class SwapOpcode extends Opcode {
     super(baseId + byteNumber, `${baseType}${byteNumber}`);
   }
 
-  run(state: IMachineState): void {
+  run(_state: IMachineState): void {
     notImplementedError();
   }
 }
