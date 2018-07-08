@@ -24,7 +24,7 @@ export interface ITransactionResult {
 }
 
 export class Blockchain {
-  private vm = new VM();
+  public readonly vm = new VM();
   private accounts: TDictionary<IAccount> = {};
   private nextAccountId = 0x0; // for now we dont implement priv/pub keys or anything
 

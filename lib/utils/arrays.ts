@@ -10,6 +10,16 @@ export function getIndex<T>(array: T[], index: number): T | undefined {
   }
 }
 
+export function getIndexOrDie<T>(array: T[], index: number): T {
+  const result = getIndex(array, index);
+
+  if (!result) {
+    throw new Error(`Trying to access element ${index} but array has only ${array.length}`);
+  }
+
+  return result;
+}
+
 /**
  * Copies `arrayToCopy` into target `array` beginning at index `at`
  * Returns new array, doesnt modify `target` array

@@ -12,6 +12,7 @@ export class LessThanOpcode extends Opcode {
 
     const result = left.lt(right);
 
-    state.stack.push(result ? new BN(0) : new BN(1));
+    state.stack.push(result ? new BN(1) : new BN(0));
+    state.pc += 1;
   }
 }

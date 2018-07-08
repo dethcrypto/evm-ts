@@ -17,6 +17,6 @@ describe("EMV-TS", () => {
     const contract = web3.eth.contract(abi).at("0x0");
     const callData = contract.test.getData().slice(2);
 
-    return compareTransactionsWithReferentialImpl([bin, callData]);
+    return compareTransactionsWithReferentialImpl([bin, callData], undefined, { debug: true });
   });
 });

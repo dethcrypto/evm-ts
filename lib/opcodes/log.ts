@@ -12,7 +12,7 @@ const range = 5;
 
 export function decodeLogFromBytecode(bytecodeIterator: PeekableIterator<number>): LogOpcode | undefined {
   const opcode = bytecodeIterator.peek();
-  if (opcode < baseId || opcode > baseId + range) return;
+  if (opcode < baseId || opcode >= baseId + range) return;
 
   const byteNumber = opcode - baseId + 1;
 

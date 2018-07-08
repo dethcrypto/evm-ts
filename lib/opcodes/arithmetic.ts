@@ -46,8 +46,14 @@ export class DivOpcode extends Opcode {
   static id = 0x04;
   static type = "DIV";
 
-  run(_state: IMachineState): void {
-    notImplementedError();
+  run(state: IMachineState): void {
+    const arg1 = state.stack.pop();
+    const arg2 = state.stack.pop();
+
+    const result = arg1.div(arg2).mod(MAX_UINT_256);
+
+    state.pc += 1;
+    state.stack.push(result);
   }
 }
 
@@ -60,8 +66,8 @@ export class IsZeroOpcode extends Opcode {
 
     const result = arg1.isZero() ? new BN(1) : new BN(0);
 
-    state.pc += 1;
     state.stack.push(result);
+    state.pc += 1;
   }
 }
 
@@ -69,8 +75,14 @@ export class AndOpcode extends Opcode {
   static id = 0x16;
   static type = "AND";
 
-  run(_state: IMachineState): void {
-    notImplementedError();
+  run(state: IMachineState): void {
+    const arg1 = state.stack.pop();
+    const arg2 = state.stack.pop();
+
+    const result = arg1.and(arg2);
+
+    state.stack.push(result);
+    state.pc += 1;
   }
 }
 
@@ -78,7 +90,13 @@ export class EqOpcode extends Opcode {
   static id = 0x14;
   static type = "EQ";
 
-  run(_state: IMachineState): void {
-    notImplementedError();
+  run(state: IMachineState): void {
+    const arg1 = state.stack.pop();
+    const arg2 = state.stack.pop();
+
+    const result = arg1.eq(arg2);
+
+    state.stack.push(result ? new BN(1) : new BN(0));
+    state.pc += 1;
   }
 }

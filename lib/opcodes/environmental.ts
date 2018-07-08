@@ -1,22 +1,20 @@
-/* tslint:disable */
-import { Opcode, notImplementedError } from "./common";
-import { IEnvironment, IMachineState } from "../VM";
 import { BN } from "bn.js";
+
+import { Opcode } from "./common";
+import { IEnvironment, IMachineState } from "../VM";
 
 export class LoadCallData extends Opcode {
   static id = 0x35;
   static type = "CALLDATALOAD";
 
-  run(_state: IMachineState): void {
-    // const readIndex = getIndex(state.stack, -1);
-    // const data = bitsToNumber(environment.slice(readIndex, readIndex + 32));
+  run(state: IMachineState, env: IEnvironment): void {
+    const readIndex = state.stack.pop().toNumber();
 
-    // return {
-    //   ...state,
-    //   stack: [...state.stack.slice(0, -1), data],
-    // };
+    const data = env.data.slice(readIndex, readIndex + 32);
+    const dataAsNumber = new BN(data);
 
-    notImplementedError();
+    state.stack.push(dataAsNumber);
+    state.pc += 1;
   }
 }
 

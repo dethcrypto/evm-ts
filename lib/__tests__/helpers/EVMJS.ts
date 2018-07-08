@@ -9,17 +9,12 @@ const keyPair = require("./keyPair");
 
 export class EVMJS {
   private nonce = 0;
-  private vm: any;
+  public readonly vm: any;
   private lastDeployedAddress?: string;
   private stateTrie = new Trie();
 
   constructor() {
     this.vm = new VMJS({ state: this.stateTrie });
-
-    // useful for debugging purposes
-    // this.vm.on("step", function(data: any) {
-    //   console.log(`${data.pc} -> ${data.opcode.name}`);
-    // });
   }
 
   public async setup(): Promise<void> {

@@ -1,23 +1,12 @@
 import { BN } from "bn.js";
+import StrictEventEmitter from "strict-event-emitter-types";
 
 import { Stack } from "./utils/Stack";
 import { DeepReadonly } from "../@types/std";
 import { decodeOpcode } from "./decodeBytecode";
 import { PeekableIterator } from "./utils/PeekableIterator";
-
-/**
- * Blockchain class:
- *  - globalstate:
- *      - address => (value, code, storage)
- *  - runTx { to?, value, data? } "to" or "data" has to be provided
- * VM class becomes a function?:
- *  - CODE becomes part of environment - immutable [DONE]
- *  - calls EVMJS's run code, implemented by adding optional return? to state  [DONE]
- * -
- *  - RETURN will return from getCode [DONE]
- *  -
- *
- */
+import { EventEmitter } from "events";
+import { Opcode } from "./opcodes/common";
 
 export interface IMachineState {
   pc: number;
@@ -46,11 +35,24 @@ const initialEnvironment: IEnvironment = {
   data: [],
 };
 
-export class VM {
+export interface IStepContext {
+  previousState: IMachineState;
+  currentOpcode: Opcode;
+}
+
+interface IVmEvents {
+  step: IStepContext;
+}
+
+const VmEventsEmitter: { new (): StrictEventEmitter<EventEmitter, IVmEvents> } = EventEmitter as any;
+
+export class VM extends VmEventsEmitter {
   private environment: IEnvironment = initialEnvironment;
   private codeIterator?: PeekableIterator<number>;
 
-  constructor(public state = deepCloneState(initialState)) {}
+  constructor(public state = deepCloneState(initialState)) {
+    super();
+  }
 
   private step(): void {
     if (this.state.stopped) {
@@ -63,6 +65,7 @@ export class VM {
       throw new Error("No environment to execute");
     }
 
+    // opcodes mutate states so we deep clone it first
     const newState = deepCloneState(this.state);
 
     if (this.state.pc >= this.environment.code.length) {
@@ -74,7 +77,8 @@ export class VM {
     this.codeIterator.index = this.state.pc;
     const opcode = decodeOpcode(this.codeIterator);
 
-    // opcodes mutate states so we deep clone it first
+    this.emit("step", { currentOpcode: opcode, previousState: this.state });
+
     try {
       opcode.run(newState, this.environment);
     } catch (e) {
@@ -86,8 +90,7 @@ export class VM {
   runCode(environment: Partial<IEnvironment> = initialEnvironment): { state: IMachineState } {
     this.environment = { ...initialEnvironment, ...environment, value: environment.value || initialEnvironment.value };
     this.codeIterator = new PeekableIterator(this.environment.code);
-    this.state.stopped = false;
-    this.state.pc = 0;
+    this.state = deepCloneState(initialState);
 
     while (!this.state.stopped) {
       this.step();

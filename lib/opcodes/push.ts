@@ -10,11 +10,11 @@ import { PeekableIterator } from "../utils/PeekableIterator";
 
 const baseId = 0x60;
 const baseType = "PUSH";
-const range = 31;
+const range = 32;
 
 export function decodePushFromBytecode(bytecodeIterator: PeekableIterator<number>): PushOpcode | undefined {
   const opcode = bytecodeIterator.peek();
-  if (opcode < baseId || opcode > baseId + range) return;
+  if (opcode < baseId || opcode >= baseId + range) return;
 
   const byteNumber = opcode - baseId + 1;
 
