@@ -29,6 +29,34 @@ export class EVMJS {
     });
   }
 
+  public async runCode(code: string, env: Partial<IEnvironment> = {}): Promise<any> {
+    return new Promise<any>(async (resolve, reject) => {
+      const data = env.data && Buffer.from(env.data as any);
+
+      try {
+        this.vm.runCode(
+          {
+            code: Buffer.from(code, "hex"),
+            // data: Buffer.from("0x0", "hex"),
+            data,
+            value: env.value,
+            gasLimit: Buffer.from("ffffffff", "hex"),
+          },
+          (err: Error | undefined, results: any) => {
+            if (err) {
+              reject(err);
+              return;
+            }
+
+            resolve(results);
+          },
+        );
+      } catch (e) {
+        reject(e);
+      }
+    });
+  }
+
   public async runTx(data: string, env?: Partial<IEnvironment>): Promise<any> {
     if (!data.startsWith("0x")) {
       return this.runTx("0x" + data, env);
@@ -50,7 +78,7 @@ export class EVMJS {
 
     return new Promise<any>(async (resolve, reject) => {
       try {
-        await this.vm.runTx(
+        this.vm.runTx(
           {
             tx: tx,
           },

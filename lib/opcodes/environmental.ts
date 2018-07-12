@@ -2,15 +2,17 @@ import { BN } from "bn.js";
 
 import { Opcode } from "./common";
 import { IEnvironment, IMachineState } from "../VM";
+import { sliceAndEnsureLength } from "../utils/arrays";
 
 export class LoadCallData extends Opcode {
   static id = 0x35;
   static type = "CALLDATALOAD";
+  static bytesToRead = 32;
 
   run(state: IMachineState, env: IEnvironment): void {
     const readIndex = state.stack.pop().toNumber();
 
-    const data = env.data.slice(readIndex, readIndex + 32);
+    const data = sliceAndEnsureLength(env.data, readIndex, LoadCallData.bytesToRead, 0) as Array<number>; // @todo fix typings for BN to avoid this ugly cast
     const dataAsNumber = new BN(data);
 
     state.stack.push(dataAsNumber);

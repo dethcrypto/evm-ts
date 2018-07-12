@@ -11,11 +11,11 @@ export async function compareWithReferentialImpl(code: string, env?: Partial<IEn
   const evmJs = new EVMJS();
   await evmJs.setup();
 
-  const ethereumJsResult = await evmJs.runTx(code, env);
-  const evmTsResult = runEvm(code, { value: env && env.value });
+  const ethereumJsResult = await evmJs.runCode(code, env);
+  const evmTsResult = runEvm(code, { value: env && env.value, data: env && env.data });
 
-  expect(evmTsResult.stack.toString()).to.be.eq(ethereumJsResult.vm.runState.stack.toString());
-  expect(evmTsResult.memory.toString()).to.be.eq(ethereumJsResult.vm.runState.memory.toString());
+  expect(evmTsResult.stack.toString()).to.be.eq(ethereumJsResult.runState.stack.toString());
+  expect(evmTsResult.memory.toString()).to.be.eq(ethereumJsResult.runState.memory.toString());
 }
 
 interface IEqualState {
@@ -68,7 +68,7 @@ export async function compareTransactionsWithReferentialImpl(
 
     let stepCounter = 0;
     for (let [evmJsResult, evmTsResult] of zip(evmJsStates, evmTsStates)) {
-      expect(evmTsResult).to.deep.eq(evmJsResult, `Internal state doesnt match at step no: ${++stepCounter}`);
+      expect(evmTsResult).to.deep.eq(evmJsResult, `Internal state doesnt match at step no: ${stepCounter++}`);
     }
 
     deployedAddress = evmTsResult.accountCreated;
