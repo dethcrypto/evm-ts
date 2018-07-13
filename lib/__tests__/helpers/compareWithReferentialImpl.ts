@@ -73,7 +73,9 @@ export async function compareTransactionsWithReferentialImpl(
       expect(evmTsResult).to.deep.eq(evmJsResult, `Internal state doesnt match at step no: ${stepCounter++}`);
     }
 
-    deployedAddress = evmTsResult.accountCreated;
+    if (evmTsResult.accountCreated) {
+      deployedAddress = evmTsResult.accountCreated;
+    }
 
     evmJs.vm.removeListener("step", evmJsStepListener);
     evmTsBlockchain.vm.removeListener("step", evmTsStepListener);

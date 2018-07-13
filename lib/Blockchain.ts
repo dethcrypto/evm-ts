@@ -1,13 +1,13 @@
 import { BN } from "bn.js";
 import * as invariant from "invariant";
 
-import { VM, IMachineState } from "./VM";
+import { VM, IMachineState, TStorage } from "./VM";
 import { TDictionary } from "../@types/std";
 
 export interface IAccount {
   value: BN;
   code?: ReadonlyArray<number>;
-  storage?: number[];
+  storage?: TStorage;
 }
 
 // @todo this is too permissive
@@ -39,7 +39,7 @@ export class Blockchain {
       this.accounts[this.nextAccountId++] = {
         value: new BN(0), // @todo tx value always 0.
         code: result.state.return,
-        // storage: result.state. // @todo missing storage
+        storage: result.state.storage,
       };
 
       return {
@@ -51,7 +51,15 @@ export class Blockchain {
       const contract = this.accounts[tx.to];
       invariant(contract, `Account ${tx.to} not found!`);
 
-      const result = this.vm.runCode({ code: contract.code, value: tx.value || new BN(0), data: tx.data });
+      const result = this.vm.runCode(
+        { code: contract.code, value: tx.value || new BN(0), data: tx.data },
+        contract.storage,
+      );
+
+      this.accounts[tx.to] = {
+        ...contract,
+        storage: result.state.storage,
+      };
 
       return {
         account: contract,
