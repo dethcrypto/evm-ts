@@ -2,16 +2,19 @@ import { BN } from "bn.js";
 import StrictEventEmitter from "strict-event-emitter-types";
 
 import { Stack } from "./utils/Stack";
-import { DeepReadonly } from "../@types/std";
+import { DeepReadonly, TDictionary } from "../@types/std";
 import { decodeOpcode } from "./decodeBytecode";
 import { PeekableIterator } from "./utils/PeekableIterator";
 import { EventEmitter } from "events";
 import { Opcode } from "./opcodes/common";
 
+export type TStorage = TDictionary<string>;
+
 export interface IMachineState {
   pc: number;
   stack: Stack<BN>;
   memory: number[];
+  storage: TStorage;
   stopped: boolean;
   return?: ReadonlyArray<number>;
 }
@@ -26,6 +29,7 @@ const initialState: IMachineState = {
   pc: 0,
   stack: new Stack(),
   memory: [],
+  storage: {},
   stopped: false,
 };
 
@@ -108,5 +112,6 @@ function deepCloneState(state: IMachineState): IMachineState {
     stopped: state.stopped,
     stack: new Stack(state.stack),
     memory: [...state.memory],
+    storage: { ...state.storage },
   };
 }

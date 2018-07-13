@@ -1,6 +1,6 @@
 import { compareWithReferentialImpl } from "../../__tests__/helpers/compareWithReferentialImpl";
 
-describe("storage opcodes", () => {
+describe("memory opcodes", () => {
   describe("MSTORE", () => {
     it("simple", () => compareWithReferentialImpl("6060600052"));
 

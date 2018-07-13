@@ -45,6 +45,7 @@
     "merkle-patricia-tree": "^2.3.1",
     "mocha": "^5.2.0",
     "nyc": "^12.0.2",
+    "rlp": "^2.1.0",
     "strict-event-emitter-types": "^1.2.0",
     "ts-node": "^6.0.5",
     "typescript": "^2.9.1",

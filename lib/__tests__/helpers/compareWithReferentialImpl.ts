@@ -1,11 +1,12 @@
 import { expect } from "chai";
 import { EVMJS } from "./EVMJS";
+import * as rlp from "rlp";
 
 import { VM, IEnvironment, IStepContext } from "../../VM";
 import { IMachineState } from "../../VM";
 import { Blockchain } from "../../Blockchain";
 import { byteStringToNumberArray } from "../../utils/bytes";
-import { zip } from "lodash";
+import { zip, Dictionary } from "lodash";
 
 export async function compareWithReferentialImpl(code: string, env?: Partial<IEnvironment>): Promise<void> {
   const evmJs = new EVMJS();
@@ -16,6 +17,7 @@ export async function compareWithReferentialImpl(code: string, env?: Partial<IEn
 
   expect(evmTsResult.stack.toString()).to.be.eq(ethereumJsResult.runState.stack.toString());
   expect(evmTsResult.memory.toString()).to.be.eq(ethereumJsResult.runState.memory.toString());
+  expect(evmTsResult.storage).to.be.deep.eq(await getFullContractStorage(ethereumJsResult));
 }
 
 interface IEqualState {
@@ -95,5 +97,31 @@ function setupDebuggingLogs(evmJs: EVMJS, evmTsBlockchain: Blockchain): void {
   evmJs.vm.on("step", (data: any) => {
     // tslint:disable-next-line
     console.log(`JS: ${data.pc} => ${data.opcode.name}`);
+  });
+}
+
+function getFullContractStorage(ethereumJsResult: any): Promise<Dictionary<string>> {
+  return new Promise((resolve, reject) => {
+    ethereumJsResult.runState.stateManager._getStorageTrie(ethereumJsResult.runState.address, (err: any, res: any) => {
+      if (err) {
+        reject(err);
+        return;
+      }
+
+      const storage: Dictionary<string> = {};
+
+      const readStream = res.createReadStream();
+
+      readStream.on("data", (data: any) => {
+        const key: string = parseInt(data.key.toString("hex")).toString(); // @todo this is quite ugly and obviously won't work in any case. To fix when storage implementation in evm-ts gets better
+        const value: string = rlp.decode(data.value).toString("hex");
+
+        storage[key] = value;
+      });
+
+      readStream.on("end", () => {
+        resolve(storage);
+      });
+    });
   });
 }
