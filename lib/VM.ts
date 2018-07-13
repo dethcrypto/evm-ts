@@ -91,10 +91,13 @@ export class VM extends VmEventsEmitter {
     this.state = newState;
   }
 
-  runCode(environment: Partial<IEnvironment> = initialEnvironment): { state: IMachineState } {
+  runCode(environment: Partial<IEnvironment> = initialEnvironment, storage?: TStorage): { state: IMachineState } {
     this.environment = { ...initialEnvironment, ...environment, value: environment.value || initialEnvironment.value };
     this.codeIterator = new PeekableIterator(this.environment.code);
     this.state = deepCloneState(initialState);
+    if (storage) {
+      this.state.storage = storage;
+    }
 
     while (!this.state.stopped) {
       this.step();
