@@ -1,16 +1,7 @@
-import { Opcode } from "./common";
+import { Opcode, notImplementedError } from "./common";
 import { IMachineState } from "../VM";
 import { MAX_UINT_256 } from "../utils/bytes";
 import { BN } from "bn.js";
-
-export class StopOpcode extends Opcode {
-  static id = 0x00;
-  static type = "STOP";
-
-  run(state: IMachineState): void {
-    state.stopped = true;
-  }
-}
 
 export class AddOpcode extends Opcode {
   static id = 0x01;
@@ -29,7 +20,7 @@ export class AddOpcode extends Opcode {
 
 export class MulOpcode extends Opcode {
   static id = 0x02;
-  static type: "MUL";
+  static type = "MUL";
 
   run(state: IMachineState): void {
     const arg1 = state.stack.pop();
@@ -42,16 +33,70 @@ export class MulOpcode extends Opcode {
   }
 }
 
+export class SubOpcode extends Opcode {
+  static id = 0x03;
+  static type = "SUB";
+
+  run(_state: IMachineState): void {
+    notImplementedError();
+  }
+}
+
+export class DivOpcode extends Opcode {
+  static id = 0x04;
+  static type = "DIV";
+
+  run(state: IMachineState): void {
+    const arg1 = state.stack.pop();
+    const arg2 = state.stack.pop();
+
+    const result = arg1.div(arg2).mod(MAX_UINT_256);
+
+    state.pc += 1;
+    state.stack.push(result);
+  }
+}
+
 export class IsZeroOpcode extends Opcode {
   static id = 0x15;
-  static type: "ISZERO";
+  static type = "ISZERO";
 
   run(state: IMachineState): void {
     const arg1 = state.stack.pop();
 
     const result = arg1.isZero() ? new BN(1) : new BN(0);
 
-    state.pc += 1;
     state.stack.push(result);
+    state.pc += 1;
+  }
+}
+
+export class AndOpcode extends Opcode {
+  static id = 0x16;
+  static type = "AND";
+
+  run(state: IMachineState): void {
+    const arg1 = state.stack.pop();
+    const arg2 = state.stack.pop();
+
+    const result = arg1.and(arg2);
+
+    state.stack.push(result);
+    state.pc += 1;
+  }
+}
+
+export class EqOpcode extends Opcode {
+  static id = 0x14;
+  static type = "EQ";
+
+  run(state: IMachineState): void {
+    const arg1 = state.stack.pop();
+    const arg2 = state.stack.pop();
+
+    const result = arg1.eq(arg2);
+
+    state.stack.push(result ? new BN(1) : new BN(0));
+    state.pc += 1;
   }
 }

@@ -13,7 +13,7 @@ const range = 16;
 
 export function decodeDupFromBytecode(bytecodeIterator: PeekableIterator<number>): DupOpcode | undefined {
   const opcode = bytecodeIterator.peek();
-  if (opcode < baseId || opcode > baseId + range) return;
+  if (opcode < baseId || opcode >= baseId + range) return;
 
   const byteNumber = opcode - baseId + 1;
 

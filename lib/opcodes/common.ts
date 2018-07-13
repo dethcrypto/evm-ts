@@ -25,3 +25,7 @@ export class UnknownOpcodeError extends Error {
     super(`Unknown opcode: 0x${opcode.toString(16)} at ${index} byte of the bytecode`);
   }
 }
+
+export function notImplementedError(): never {
+  throw new Error("Not implemented yet!");
+}

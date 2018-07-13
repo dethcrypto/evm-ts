@@ -11,6 +11,14 @@ export class Stack<T> extends Array<T> {
       throw new Error("Cannot pop empty stack!");
     }
 
-    return Array.prototype.pop.apply(this);
+    return super.pop()!;
+  }
+
+  public push(item: T): number {
+    if (item === undefined || item === null) {
+      throw new Error("Cannot push undefined/null on stack!");
+    }
+
+    return super.push(item);
   }
 }

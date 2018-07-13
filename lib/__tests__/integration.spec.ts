@@ -1,10 +1,22 @@
-import { compareWithReferentialImpl } from "./helpers/compareWithReferentialImpl";
+import * as fs from "fs";
+import { join } from "path";
+import * as Web3 from "web3";
+const web3 = new Web3();
+
+import {
+  compareWithReferentialImpl,
+  compareTransactionsWithReferentialImpl,
+} from "./helpers/compareWithReferentialImpl";
 
 describe("EMV-TS", () => {
   it("should work", () => compareWithReferentialImpl("60606040523415600e"));
 
-  it.skip("should work with more complicated bytecode", () =>
-    compareWithReferentialImpl(
-      "60606040523415600e57600080fd5b5b60016000819055505b5b60368060266000396000f30060606040525b600080fd00a165627a7a72305820af3193f6fd31031a0e0d2de1ad2c27352b1ce081b4f3c92b5650ca4dd542bb770029",
-    ));
+  it.skip("should work with more complicated bytecode", () => {
+    const bin = fs.readFileSync(join(__dirname, "./contracts/DumbContract.bin"), "utf-8");
+    const abi = JSON.parse(fs.readFileSync(join(__dirname, "./contracts/DumbContract.abi"), "utf-8"));
+    const contract = web3.eth.contract(abi).at("0x0");
+    const callData = contract.test.getData().slice(2);
+
+    return compareTransactionsWithReferentialImpl([bin, callData], undefined);
+  });
 });

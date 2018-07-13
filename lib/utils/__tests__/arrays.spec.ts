@@ -1,6 +1,6 @@
 import { expect } from "chai";
 
-import { arrayCopy, getIndex } from "../arrays";
+import { arrayCopy, getIndex, sliceAndEnsureLength } from "../arrays";
 
 describe("array utils", () => {
   describe("getIndex", () => {
@@ -22,6 +22,16 @@ describe("array utils", () => {
       const result = arrayCopy(A, B, 2);
 
       expect(result).to.be.deep.eq([1, 2, 11, 22, 33, 44]);
+    });
+  });
+
+  describe("sliceAndEnsureLength", () => {
+    it("should work", () => {
+      const array = [1, 2, 3];
+
+      const actual = sliceAndEnsureLength(array, 2, 3, 0);
+
+      expect(actual).to.be.deep.eq([3, 0, 0]);
     });
   });
 });

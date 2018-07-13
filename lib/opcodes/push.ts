@@ -1,4 +1,3 @@
-import * as invariant from "invariant";
 import { BN } from "bn.js";
 
 import { Opcode, DecodeError } from "./common";
@@ -11,11 +10,11 @@ import { PeekableIterator } from "../utils/PeekableIterator";
 
 const baseId = 0x60;
 const baseType = "PUSH";
-const range = 31;
+const range = 32;
 
 export function decodePushFromBytecode(bytecodeIterator: PeekableIterator<number>): PushOpcode | undefined {
   const opcode = bytecodeIterator.peek();
-  if (opcode < baseId || opcode > baseId + range) return;
+  if (opcode < baseId || opcode >= baseId + range) return;
 
   const byteNumber = opcode - baseId + 1;
 
@@ -32,11 +31,6 @@ export function decodePushFromBytecode(bytecodeIterator: PeekableIterator<number
 export class PushOpcode extends Opcode {
   constructor(public byteNumber: number, public arg: BN) {
     super(baseId + byteNumber, `${baseType}${byteNumber}`);
-
-    invariant(
-      byteNumber === arg.toArray().length,
-      `byte number (${byteNumber}) doesn't match args bytes: ${arg.toString()}`,
-    );
   }
 
   run(state: IMachineState): void {
