@@ -1,4 +1,4 @@
-import { Opcode, notImplementedError } from "./common";
+import { Opcode } from "./common";
 import { IMachineState } from "../VM";
 import { MAX_UINT_256 } from "../utils/bytes";
 import { BN } from "bn.js";
@@ -37,8 +37,14 @@ export class SubOpcode extends Opcode {
   static id = 0x03;
   static type = "SUB";
 
-  run(_state: IMachineState): void {
-    notImplementedError();
+  run(state: IMachineState): void {
+    const arg1 = state.stack.pop();
+    const arg2 = state.stack.pop();
+
+    const result = arg1.sub(arg2).mod(MAX_UINT_256);
+
+    state.pc += 1;
+    state.stack.push(result);
   }
 }
 

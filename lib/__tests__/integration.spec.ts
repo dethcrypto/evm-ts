@@ -11,7 +11,7 @@ import {
 describe("EMV-TS", () => {
   it("should work", () => compareWithReferentialImpl("60606040523415600e"));
 
-  it.skip("should work with more complicated bytecode", () => {
+  it("should work with more complicated bytecode", () => {
     const bin = fs.readFileSync(join(__dirname, "./contracts/DumbContract.bin"), "utf-8");
     const abi = JSON.parse(fs.readFileSync(join(__dirname, "./contracts/DumbContract.abi"), "utf-8"));
     const contract = web3.eth.contract(abi).at("0x0");

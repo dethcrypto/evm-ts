@@ -1,6 +1,7 @@
 import { IMachineState, IEnvironment } from "../VM";
-import { Opcode, notImplementedError } from "./common";
+import { Opcode } from "./common";
 import { arrayCopy } from "../utils/arrays";
+import { BN } from "bn.js";
 
 /**
  * Stores full word in memory.
@@ -29,8 +30,14 @@ export class MLoadOpcode extends Opcode {
   static id = 0x51;
   static type = "MLOAD";
 
-  run(_state: IMachineState): void {
-    notImplementedError();
+  run(state: IMachineState): void {
+    const address = state.stack.pop().toNumber();
+    const valueRaw = state.memory.slice(address, address + 32);
+
+    const value = new BN(valueRaw, undefined, "be");
+
+    state.stack.push(value);
+    state.pc += 1;
   }
 }
 
