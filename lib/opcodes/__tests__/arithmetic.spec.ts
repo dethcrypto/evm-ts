@@ -15,6 +15,15 @@ describe("arithmetic opcodes", () => {
       ));
   });
 
+  describe("SUB", () => {
+    it("SUB with overflow", () =>
+      compareWithReferentialImpl(
+        "7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff03",
+      ));
+
+    it.skip("SUB with minus sign");
+  });
+
   describe("DIV", () => {
     it("div with overflow", () =>
       compareWithReferentialImpl(
