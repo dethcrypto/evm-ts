@@ -1,6 +1,6 @@
 import { expect } from "chai";
 
-import { arrayCopy, getIndex, sliceAndEnsureLength } from "../arrays";
+import { arrayCopy, getIndex, sliceAndEnsureLength, getIndexOrDie } from "../arrays";
 
 describe("array utils", () => {
   describe("getIndex", () => {
@@ -11,6 +11,14 @@ describe("array utils", () => {
       expect(getIndex(array, -1)).to.be.eq(3);
       expect(getIndex(array, -2)).to.be.eq(2);
       expect(getIndex(array, -5)).to.be.eq(undefined);
+    });
+  });
+
+  describe("getIndexOrDie", () => {
+    const array = [1, 2, 3];
+
+    it("should work", () => {
+      expect(() => getIndexOrDie(array, 3)).to.throw("Trying to access element 3 but array has only 3");
     });
   });
 

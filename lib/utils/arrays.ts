@@ -13,7 +13,7 @@ export function getIndex<T>(array: T[], index: number): T | undefined {
 export function getIndexOrDie<T>(array: T[], index: number): T {
   const result = getIndex(array, index);
 
-  if (!result) {
+  if (result === undefined) {
     throw new Error(`Trying to access element ${index} but array has only ${array.length}`);
   }
 
