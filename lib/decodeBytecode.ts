@@ -1,21 +1,17 @@
 import { keyBy } from "lodash";
 
 import { Opcode, UnknownOpcodeError } from "./opcodes/common";
-import * as opcodes from "./opcodes/index";
+import * as opcodes from "./opcodes";
 import { PeekableIterator } from "./utils/PeekableIterator";
-import { decodePushFromBytecode } from "./opcodes/index";
-import { decodeDupFromBytecode } from "./opcodes/dup";
-import { decodeSwapFromBytecode } from "./opcodes/swap";
-import { decodeLogFromBytecode } from "./opcodes/log";
 import { TDictionary } from "../@types/std";
 
 const opcodesById: TDictionary<new () => Opcode> = keyBy(opcodes as any, "id");
 
 const dynamicOpcodesDecoders = [
-  decodePushFromBytecode,
-  decodeDupFromBytecode,
-  decodeSwapFromBytecode,
-  decodeLogFromBytecode,
+  opcodes.decodePushFromBytecode,
+  opcodes.decodeDupFromBytecode,
+  opcodes.decodeSwapFromBytecode,
+  opcodes.decodeLogFromBytecode,
 ];
 
 export function decodeOpcode(bytesIterator: PeekableIterator<number>): Opcode {
