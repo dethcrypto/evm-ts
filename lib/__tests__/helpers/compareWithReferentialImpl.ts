@@ -4,7 +4,7 @@ import * as rlp from "rlp";
 
 import { VM, IEnvironment, IStepContext } from "../../VM";
 import { IMachineState } from "../../VM";
-import { Blockchain } from "../../Blockchain";
+import { FakeBlockchain } from "../../FakeBlockchain";
 import { byteStringToNumberArray } from "../../utils/bytes";
 import { zip, Dictionary } from "lodash";
 
@@ -35,7 +35,7 @@ export async function compareTransactionsWithReferentialImpl(
 
   const evmJs = new EVMJS();
   await evmJs.setup();
-  const evmTsBlockchain = new Blockchain();
+  const evmTsBlockchain = new FakeBlockchain();
 
   if (debug) {
     setupDebuggingLogs(evmJs, evmTsBlockchain);
