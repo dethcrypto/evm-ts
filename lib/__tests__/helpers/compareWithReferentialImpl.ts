@@ -4,7 +4,7 @@ import * as rlp from "rlp";
 
 import { VM, IEnvironment, IStepContext } from "../../VM";
 import { IMachineState } from "../../VM";
-import { Blockchain } from "../../Blockchain";
+import { FakeBlockchain } from "../../FakeBlockchain";
 import { byteStringToNumberArray } from "../../utils/bytes";
 import { zip, Dictionary } from "lodash";
 
@@ -18,6 +18,22 @@ export async function compareWithReferentialImpl(code: string, env?: Partial<IEn
   expect(evmTsResult.stack.toString()).to.be.eq(ethereumJsResult.runState.stack.toString());
   expect(evmTsResult.memory.toString()).to.be.eq(ethereumJsResult.runState.memory.toString());
   expect(evmTsResult.storage).to.be.deep.eq(await getFullContractStorage(ethereumJsResult));
+}
+
+export async function compareInvalidCodeWithReferentialImpl(
+  code: string,
+  jsError: string,
+  tsError: string,
+  env?: Partial<IEnvironment>,
+): Promise<void> {
+  const evmJs = new EVMJS();
+  await evmJs.setup();
+
+  const jsAsyncResult = await evmJs.runCode(code, env).catch(e => e);
+
+  expect(jsAsyncResult.error).to.be.eq(jsError);
+
+  expect(() => runEvm(code, { value: env && env.value, data: env && env.data })).to.throw(tsError);
 }
 
 interface IEqualState {
@@ -35,7 +51,7 @@ export async function compareTransactionsWithReferentialImpl(
 
   const evmJs = new EVMJS();
   await evmJs.setup();
-  const evmTsBlockchain = new Blockchain();
+  const evmTsBlockchain = new FakeBlockchain();
 
   if (debug) {
     setupDebuggingLogs(evmJs, evmTsBlockchain);
@@ -90,7 +106,7 @@ export function runEvm(bytecode: string, env?: Partial<IEnvironment>): IMachineS
   return vm.state;
 }
 
-function setupDebuggingLogs(evmJs: EVMJS, evmTsBlockchain: Blockchain): void {
+function setupDebuggingLogs(evmJs: EVMJS, evmTsBlockchain: FakeBlockchain): void {
   evmTsBlockchain.vm.on("step", ctx => {
     // tslint:disable-next-line
     console.log(`TS: ${ctx.previousState.pc} => ${ctx.currentOpcode.type}`);
