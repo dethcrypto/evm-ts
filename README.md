@@ -3,8 +3,8 @@
   <p align="center">Ethereum Virtual Machine implemented in TypeScript</p>
 
   <p align="center">
-    <a href="https://circleci.com/gh/krzkaczor/evm-ts"><img alt="Build Status" src="https://circleci.com/gh/krzkaczor/evm-ts.svg?style=svg"></a>
-    <a href='https://coveralls.io/github/krzkaczor/evm-ts'><img src='https://coveralls.io/repos/github/krzkaczor/evm-ts/badge.svg' alt='Coverage Status' /></a>
+    <a href="https://circleci.com/gh/ethereum-ts/evm-ts"><img alt="Build Status" src="https://circleci.com/gh/ethereum-ts/evm-ts.svg?style=svg"></a>
+    <a href='https://coveralls.io/github/ethereum-ts/evm-ts'><img src='https://coveralls.io/repos/github/ethereum-ts/evm-ts/badge.svg' alt='Coverage Status' /></a>
     <a href="https://github.com/prettier/prettier"><img alt="Prettier" src="https://img.shields.io/badge/code_style-prettier-ff69b4.svg"></a>
     <a href="/package.json"><img alt="Software License" src="https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square"></a>
   </p>
