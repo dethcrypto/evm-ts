@@ -4,7 +4,7 @@ import * as Trie from "merkle-patricia-tree";
 import * as Account from "ethereumjs-account";
 import * as utils from "ethereumjs-util";
 
-import { IEnvironment } from "../../VM";
+import { IEnvironment } from "../../lib/VM";
 const keyPair = require("./keyPair");
 
 export class EVMJS {

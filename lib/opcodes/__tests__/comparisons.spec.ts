@@ -1,4 +1,4 @@
-import { compareWithReferentialImpl } from "../../__tests__/helpers/compareWithReferentialImpl";
+import { compareWithReferentialImpl } from "test/helpers/compareWithReferentialImpl";
 
 describe("comparison opcodes", () => {
   describe("LT", () => {

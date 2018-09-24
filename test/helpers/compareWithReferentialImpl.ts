@@ -1,12 +1,11 @@
 import { expect } from "chai";
 import { EVMJS } from "./EVMJS";
 import * as rlp from "rlp";
-
-import { VM, IEnvironment, IStepContext } from "../../VM";
-import { IMachineState } from "../../VM";
-import { FakeBlockchain } from "../../FakeBlockchain";
-import { byteStringToNumberArray } from "../../utils/bytes";
 import { zip, Dictionary } from "lodash";
+
+import { VM, IEnvironment, IStepContext, IMachineState } from "../../lib/VM";
+import { FakeBlockchain } from "../../lib/FakeBlockchain";
+import { byteStringToNumberArray } from "../../lib/utils/bytes";
 
 export async function compareWithReferentialImpl(code: string, env?: Partial<IEnvironment>): Promise<void> {
   const evmJs = new EVMJS();

@@ -1,4 +1,4 @@
-import { compareWithReferentialImpl } from "../../__tests__/helpers/compareWithReferentialImpl";
+import { compareWithReferentialImpl } from "test/helpers/compareWithReferentialImpl";
 
 describe("SWAP", () => {
   it("should swap 1st data", () => compareWithReferentialImpl("6001600290"));

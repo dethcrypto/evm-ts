@@ -4,7 +4,7 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "prepare": "solcjs ./lib/__tests__/contracts/*.sol --bin --abi -o ./lib/__tests__/contracts --overwrite",
+    "compile-solidity": "solcjs ./test/contracts/*.sol --bin --abi -o ./test/contracts-compiled --overwrite",
     "format": "prettier --list-different '**/*.{ts,json,md, gql}'",
     "format:fix": "prettier --write '**/*.{ts,json,md,gql}'",
     "tslint": "tslint -p ./tsconfig.json -e 'node_modules/**/*' -e '**/node_modules/**/*' '**/*.ts'",
@@ -15,8 +15,10 @@
     "test": "yarn lint && yarn test:mocha",
     "test:coverage": "yarn lint && yarn test:mocha:coverage",
     "test:fix": "yarn lint:fix && yarn test:mocha",
-    "test:mocha": "NODE_ENV=test mocha --require ts-node/register '**/*.spec.ts'",
-    "test:mocha:coverage": "NODE_ENV=test nyc mocha --require ts-node/register '**/*.spec.ts'",
+    "test:mocha": "NODE_ENV=test mocha -r ts-node/register -r tsconfig-paths/register '**/*.spec.ts'",
+    "pretest:mocha": "yarn compile-solidity",
+    "test:mocha:coverage": "NODE_ENV=test nyc mocha -r ts-node/register -r tsconfig-paths/register '**/*.spec.ts'",
+    "pretest:mocha:coverage": "yarn compile-solidity",
     "coveralls": "nyc report --reporter=text-lcov | coveralls"
   },
   "dependencies": {
@@ -48,6 +50,7 @@
     "rlp": "^2.1.0",
     "strict-event-emitter-types": "^1.2.0",
     "ts-node": "^6.0.5",
+    "tsconfig-paths": "^3.6.0",
     "typescript": "^2.9.2",
     "web3": "0.20.6"
   }

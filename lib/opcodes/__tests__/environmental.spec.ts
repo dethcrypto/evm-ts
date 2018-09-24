@@ -1,4 +1,4 @@
-import { compareWithReferentialImpl } from "../../__tests__/helpers/compareWithReferentialImpl";
+import { compareWithReferentialImpl } from "test/helpers/compareWithReferentialImpl";
 import { BN } from "bn.js";
 import { byteStringToNumberArray } from "../../utils/bytes";
 

@@ -1,4 +1,4 @@
-import { compareWithReferentialImpl } from "../../__tests__/helpers/compareWithReferentialImpl";
+import { compareWithReferentialImpl } from "test/helpers/compareWithReferentialImpl";
 
 describe("storage opcodes", () => {
   describe("SSTORE", () => {
