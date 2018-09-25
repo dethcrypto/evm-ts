@@ -34,7 +34,7 @@ export function arrayCopy<T>(target: ReadonlyArray<T>, arrayToCopy: ReadonlyArra
 }
 
 /**
- * Slice that ensures that final array has desired lenght. WARNING: parameters are different then Array.prototype.length
+ * Slice that ensures that final array has desired length. WARNING: parameters are different then Array.prototype.slice
  */
 export function sliceAndEnsureLength<T>(
   array: ReadonlyArray<T>,

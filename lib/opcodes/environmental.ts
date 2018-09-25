@@ -12,7 +12,7 @@ export class LoadCallData extends Opcode {
   run(state: IMachineState, env: IEnvironment): void {
     const readIndex = state.stack.pop().toNumber();
 
-    const data = sliceAndEnsureLength(env.data, readIndex, LoadCallData.bytesToRead, 0) as Array<number>; // @todo fix typings for BN to avoid this ugly cast
+    const data = sliceAndEnsureLength(env.data, readIndex, LoadCallData.bytesToRead, 0);
     const dataAsNumber = new BN(data);
 
     state.stack.push(dataAsNumber);

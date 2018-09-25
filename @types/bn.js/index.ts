@@ -4,7 +4,11 @@ declare module "bn.js" {
   type Endianness = "le" | "be";
 
   export class BN {
-    constructor(number: number | string | number[] | Buffer, base?: number, endian?: Endianness);
+    constructor(
+      number: number | string | number[] | ReadonlyArray<number> | Buffer,
+      base?: number,
+      endian?: Endianness,
+    );
     clone(): BN;
     toString(base?: number, length?: number): string;
     toNumber(): number;

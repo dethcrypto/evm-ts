@@ -4,7 +4,11 @@ import { Dictionary } from "ts-essentials";
 
 import { VM, IMachineState, TStorage } from "./VM";
 
+// @todo
+// this should be union type ContractAccount | PersonalAccount
+// and should be immutable
 export interface IAccount {
+  id: string; // @todo this should be BN
   value: BN;
   code?: ReadonlyArray<number>;
   storage?: TStorage;
@@ -28,43 +32,38 @@ export class FakeBlockchain {
   private accounts: Dictionary<IAccount> = {};
   private nextAccountId = 0x0; // for now we dont implement priv/pub keys or anything
 
-  // @todo REFACTOR
+  private createNewAccount(): IAccount {
+    const account = {
+      id: (this.nextAccountId++).toString(),
+      value: new BN(0),
+    };
+
+    this.accounts[account.id] = account;
+
+    return account;
+  }
+
   public runTx(tx: ITransaction): ITransactionResult {
     invariant(tx.data || tx.to || tx.value, "Tx is empty");
 
-    if (!tx.to) {
-      const result = this.vm.runCode({ code: tx.data, value: tx.value || new BN(0) });
-      invariant(result.state.return, "Code deployment has to return code");
+    const deployingNewContract = !tx.to;
 
-      this.accounts[this.nextAccountId++] = {
-        value: new BN(0), // @todo tx value always 0.
-        code: result.state.return,
-        storage: result.state.storage,
-      };
+    const account = deployingNewContract ? this.createNewAccount() : this.accounts[tx.to!];
+    invariant(account, `Account ${tx.to} not found!`);
 
-      return {
-        account: this.accounts[this.nextAccountId],
-        runState: result.state,
-        accountCreated: (this.nextAccountId - 1).toString(),
-      };
-    } else {
-      const contract = this.accounts[tx.to];
-      invariant(contract, `Account ${tx.to} not found!`);
+    const codeToExecute = deployingNewContract ? tx.data : account.code;
 
-      const result = this.vm.runCode(
-        { code: contract.code, value: tx.value || new BN(0), data: tx.data },
-        contract.storage,
-      );
+    const result = this.vm.runCode({ code: codeToExecute, data: tx.data, value: tx.value }, account.storage);
 
-      this.accounts[tx.to] = {
-        ...contract,
-        storage: result.state.storage,
-      };
-
-      return {
-        account: contract,
-        runState: result.state,
-      };
+    account.storage = result.state.storage;
+    if (deployingNewContract) {
+      account.code = result.state.return;
     }
+
+    return {
+      account,
+      runState: result.state,
+      accountCreated: deployingNewContract ? account.id : undefined,
+    };
   }
 }
