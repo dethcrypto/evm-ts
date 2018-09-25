@@ -1,14 +1,15 @@
 import { BN } from "bn.js";
 import StrictEventEmitter from "strict-event-emitter-types";
+import { Dictionary } from "ts-essentials";
 
 import { Stack } from "./utils/Stack";
-import { DeepReadonly, TDictionary } from "../@types/std";
+import { DeepReadonly } from "../@types/std";
 import { decodeOpcode } from "./decodeBytecode";
 import { PeekableIterator } from "./utils/PeekableIterator";
 import { EventEmitter } from "events";
 import { Opcode } from "./opcodes/common";
 
-export type TStorage = TDictionary<string>;
+export type TStorage = Dictionary<string>;
 
 export interface IMachineState {
   pc: number;

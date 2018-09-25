@@ -1,8 +1,8 @@
 import { BN } from "bn.js";
 import * as invariant from "invariant";
+import { Dictionary } from "ts-essentials";
 
 import { VM, IMachineState, TStorage } from "./VM";
-import { TDictionary } from "../@types/std";
 
 export interface IAccount {
   value: BN;
@@ -25,7 +25,7 @@ export interface ITransactionResult {
 
 export class FakeBlockchain {
   public readonly vm = new VM();
-  private accounts: TDictionary<IAccount> = {};
+  private accounts: Dictionary<IAccount> = {};
   private nextAccountId = 0x0; // for now we dont implement priv/pub keys or anything
 
   // @todo REFACTOR

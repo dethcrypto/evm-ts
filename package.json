@@ -27,6 +27,7 @@
     "invariant": "^2.2.4",
     "lodash": "^4.17.11",
     "prettier": "^1.14.3",
+    "ts-essentials": "^1.0.0",
     "tslint": "^5.11.0",
     "typestrict": "^1.0.0"
   },

@@ -1,11 +1,11 @@
 import { keyBy } from "lodash";
+import { Dictionary } from "ts-essentials";
 
 import { Opcode, UnknownOpcodeError } from "./opcodes/common";
 import * as opcodes from "./opcodes";
 import { PeekableIterator } from "./utils/PeekableIterator";
-import { TDictionary } from "../@types/std";
 
-const opcodesById: TDictionary<new () => Opcode> = keyBy(opcodes as any, "id");
+const opcodesById: Dictionary<new () => Opcode> = keyBy(opcodes as any, "id");
 
 const dynamicOpcodesDecoders = [
   opcodes.decodePushFromBytecode,
