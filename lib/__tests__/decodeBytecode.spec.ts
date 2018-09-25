@@ -1,8 +1,8 @@
 import { expect } from "chai";
+import { BN } from "bn.js";
 
 import { decodeOpcode } from "../decodeBytecode";
 import { PushOpcode } from "../opcodes";
-import { BN } from "bn.js";
 import { PeekableIterator } from "../utils/PeekableIterator";
 import { byteStringToNumberArray } from "../utils/bytes";
 import { Opcode } from "../opcodes/common";
