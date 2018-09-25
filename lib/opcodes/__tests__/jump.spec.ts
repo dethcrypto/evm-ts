@@ -1,7 +1,7 @@
 import {
   compareWithReferentialImpl,
   compareInvalidCodeWithReferentialImpl,
-} from "../../__tests__/helpers/compareWithReferentialImpl";
+} from "test/helpers/compareWithReferentialImpl";
 
 describe("jump opcodes", () => {
   describe("JUMP", () => {

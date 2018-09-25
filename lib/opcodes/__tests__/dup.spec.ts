@@ -1,6 +1,6 @@
 import { expect } from "chai";
 
-import { compareWithReferentialImpl, runEvm } from "../../__tests__/helpers/compareWithReferentialImpl";
+import { compareWithReferentialImpl, runEvm } from "test/helpers/compareWithReferentialImpl";
 
 describe("DUP", () => {
   it("should work", () => compareWithReferentialImpl("60ff600081"));
