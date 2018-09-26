@@ -1,10 +1,10 @@
 import { expect } from "chai";
-import { EVMJS } from "./EVMJS";
 import * as rlp from "rlp";
 import { zip, Dictionary } from "lodash";
 
+import { EVMJS } from "./EVMJS";
 import { VM, IEnvironment, IStepContext, IMachineState } from "../../lib/VM";
-import { FakeBlockchain } from "../../lib/FakeBlockchain";
+import { FakeBlockchain, ITransactionResult, IExternalTransaction } from "../../lib/FakeBlockchain";
 import { byteStringToNumberArray } from "../../lib/utils/bytes";
 
 export async function compareWithReferentialImpl(code: string, env?: Partial<IEnvironment>): Promise<void> {
@@ -41,59 +41,72 @@ interface IEqualState {
   pc: number;
 }
 
-export async function compareTransactionsWithReferentialImpl(
-  codes: string[],
-  env?: Partial<IEnvironment>,
-  options?: { debug: boolean },
-): Promise<void> {
-  const debug = options && options.debug;
+interface IVm {
+  type: "js" | "ts";
+  runTx(tx: IExternalTransaction): Promise<ITransactionResult>;
+}
 
+/**
+ * Runs `script` twice. Once with JS impl and once with TS one.
+ * When we reach higher compatibility with EthereumJS this can be greatly simplified just by running script once and basically everything should be the same on both implementations.
+ * Currently evm-ts returns totally different addresses etc.
+ */
+export async function compareTransactionsWithReferentialImpl(script: (vm: IVm) => Promise<void>): Promise<void> {
   const evmJs = new EVMJS();
   await evmJs.setup();
   const evmTsBlockchain = new FakeBlockchain();
 
-  if (debug) {
-    setupDebuggingLogs(evmJs, evmTsBlockchain);
+  const evmJsStates: IEqualState[][] = [];
+  const evmTsStates: IEqualState[][] = [];
+
+  function getLastArray(nestedArrays: any[][]): any[] {
+    return nestedArrays[nestedArrays.length - 1];
   }
 
-  let deployedAddress: string | undefined = undefined;
+  // setup JS event listeners
+  const evmJsStepListener = (data: any) => {
+    getLastArray(evmJsStates).push({ stack: data.stack.toString(), memory: data.memory.toString(), pc: data.pc });
+  };
+  evmJs.vm.on("step", evmJsStepListener);
 
-  for (const code of codes) {
-    const evmJsStates: IEqualState[] = [];
-    const evmTsStates: IEqualState[] = [];
-
-    const evmJsStepListener = (data: any) => {
-      evmJsStates.push({ stack: data.stack.toString(), memory: data.memory.toString(), pc: data.pc });
-    };
-    evmJs.vm.on("step", evmJsStepListener);
-
-    const evmTsStepListener = (data: IStepContext) => {
-      evmTsStates.push({
-        stack: data.previousState.stack.toString(),
-        memory: data.previousState.memory.toString(),
-        pc: data.previousState.pc,
-      });
-    };
-    evmTsBlockchain.vm.on("step", evmTsStepListener);
-
-    await evmJs.runTx(code, env);
-    const evmTsResult = evmTsBlockchain.runTx({
-      data: byteStringToNumberArray(code),
-      value: env && env.value,
-      to: deployedAddress,
+  // setup TS event listeners
+  const evmTsStepListener = (data: IStepContext) => {
+    getLastArray(evmTsStates).push({
+      stack: data.previousState.stack.toString(),
+      memory: data.previousState.memory.toString(),
+      pc: data.previousState.pc,
     });
+  };
+  evmTsBlockchain.vm.on("step", evmTsStepListener);
 
-    let stepCounter = 0;
-    for (let [evmJsResult, evmTsResult] of zip(evmJsStates, evmTsStates)) {
-      expect(evmTsResult).to.deep.eq(evmJsResult, `Internal state doesnt match at step no: ${stepCounter++}`);
-    }
+  // run js impl
+  const jsVmAdapter: IVm = {
+    type: "js",
+    async runTx(tx: IExternalTransaction): Promise<ITransactionResult> {
+      evmJsStates.push([]); // prepare empty state for listeners
+      return await evmJs.runTx(tx);
+    },
+  };
+  await script(jsVmAdapter);
 
-    if (evmTsResult.accountCreated) {
-      deployedAddress = evmTsResult.accountCreated;
-    }
+  // run ts impl
+  const tsVmAdapter: IVm = {
+    type: "ts",
+    async runTx(tx: IExternalTransaction): Promise<ITransactionResult> {
+      evmTsStates.push([]); // prepare empty state for listeners
+      return evmTsBlockchain.runTx({
+        data: byteStringToNumberArray(tx.data!),
+        to: tx.to,
+        value: tx.value,
+      });
+    },
+  };
+  await script(tsVmAdapter);
 
-    evmJs.vm.removeListener("step", evmJsStepListener);
-    evmTsBlockchain.vm.removeListener("step", evmTsStepListener);
+  //compare results
+  let stepCounter = 0;
+  for (let [evmJsResult, evmTsResult] of zip(evmJsStates, evmTsStates)) {
+    expect(evmTsResult).to.deep.eq(evmJsResult, `Internal state doesnt match at tx no: ${stepCounter++}`);
   }
 }
 
@@ -105,6 +118,7 @@ export function runEvm(bytecode: string, env?: Partial<IEnvironment>): IMachineS
   return vm.state;
 }
 
+//tslint:disable-next-line
 function setupDebuggingLogs(evmJs: EVMJS, evmTsBlockchain: FakeBlockchain): void {
   evmTsBlockchain.vm.on("step", ctx => {
     // tslint:disable-next-line

@@ -14,6 +14,12 @@ export interface IAccount {
   storage?: TStorage;
 }
 
+export interface IExternalTransaction {
+  to?: string;
+  data?: string; // @todo this is the only difference between this and ITransaction
+  value?: BN;
+}
+
 // @todo this is too permissive
 export interface ITransaction {
   to?: string;

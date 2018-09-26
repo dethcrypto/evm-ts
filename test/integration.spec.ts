@@ -16,8 +16,14 @@ describe("EMV-TS", () => {
     const abi = JSON.parse(fs.readFileSync(join(__dirname, "./contracts-compiled/DumbContract.abi"), "utf-8"));
     const contract = web3.eth.contract(abi).at("0x0");
 
-    const callTestFunctionData = contract.test.getData().slice(2);
+    const callTestFunctionData: string = contract.test.getData().slice(2);
 
-    return compareTransactionsWithReferentialImpl([bin, callTestFunctionData, callTestFunctionData], undefined);
+    return compareTransactionsWithReferentialImpl(async vm => {
+      const deploymentResult = await vm.runTx({ data: bin });
+      const contractAddress = deploymentResult.accountCreated;
+
+      await vm.runTx({ data: callTestFunctionData, to: contractAddress });
+      await vm.runTx({ data: callTestFunctionData, to: contractAddress });
+    });
   });
 });

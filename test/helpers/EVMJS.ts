@@ -5,12 +5,13 @@ import * as Account from "ethereumjs-account";
 import * as utils from "ethereumjs-util";
 
 import { IEnvironment } from "../../lib/VM";
+import { IExternalTransaction, ITransactionResult } from "lib/FakeBlockchain";
+import invariant = require("invariant");
 const keyPair = require("./keyPair");
 
 export class EVMJS {
   private nonce = 0;
   public readonly vm: any;
-  private lastDeployedAddress?: string;
   private stateTrie = new Trie();
 
   constructor() {
@@ -57,18 +58,24 @@ export class EVMJS {
     });
   }
 
-  public async runTx(data: string, env?: Partial<IEnvironment>): Promise<any> {
-    if (!data.startsWith("0x")) {
-      return this.runTx("0x" + data, env);
+  public async runTx(transaction: IExternalTransaction): Promise<ITransactionResult> {
+    invariant(transaction.data, "Tx data is required");
+
+    if (!transaction.data!.startsWith("0x")) {
+      return this.runTx({
+        data: "0x" + transaction.data!,
+        to: transaction.to,
+        value: transaction.value,
+      });
     }
 
     const nonce = "0x" + this.nonce.toString(16);
     this.nonce += 1; // advance nonce for next tx;
 
     const tx = new Transaction({
-      data,
-      value: env && env.value,
-      to: this.lastDeployedAddress,
+      data: transaction.data,
+      value: transaction.value,
+      to: transaction.to,
       nonce,
       gasPrice: "0x09184e72a000",
       gasLimit: "0x90710",
@@ -88,12 +95,12 @@ export class EVMJS {
               return;
             }
 
-            if (results.createdAddress) {
-              // tslint:disable-next-line
-              this.lastDeployedAddress = "0x" + results.createdAddress.toString("hex");
-            }
-
-            resolve(results);
+            // @todo translating evmjs result to our internal type is not fully done
+            resolve({
+              account: {},
+              runState: {},
+              accountCreated: results.createdAddress && `0x${results.createdAddress.toString("hex")}`,
+            });
           },
         );
       } catch (e) {
