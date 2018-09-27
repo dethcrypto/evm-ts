@@ -4,7 +4,7 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "compile-solidity": "solcjs ./test/contracts/*.sol --bin --abi -o ./test/contracts-compiled --overwrite",
+    "compile-solidity": "solcjs ./test/contracts/simple/*.sol --bin --abi -o ./test/contracts-compiled/simple --overwrite && solcjs ./test/contracts/calls/*.sol --bin --abi -o ./test/contracts-compiled/calls --overwrite",
     "format": "prettier --list-different '**/*.{ts,json,md, gql}'",
     "format:fix": "prettier --write '**/*.{ts,json,md,gql}'",
     "tslint": "tslint -p ./tsconfig.json -e 'node_modules/**/*' -e '**/node_modules/**/*' '**/*.ts'",
