@@ -38,7 +38,6 @@ export class EVMJS {
         this.vm.runCode(
           {
             code: Buffer.from(code, "hex"),
-            // data: Buffer.from("0x0", "hex"),
             data,
             value: env.value,
             gasLimit: Buffer.from("ffffffff", "hex"),
