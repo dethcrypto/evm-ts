@@ -1,7 +1,7 @@
 import { Opcode } from "./common";
-import { IMachineState } from "../VM";
 import { PeekableIterator } from "../utils/PeekableIterator";
 import { getIndexOrDie } from "../utils/arrays";
+import { IMachineState } from "../types";
 
 /**
  * SWAP is a family of opcodes.

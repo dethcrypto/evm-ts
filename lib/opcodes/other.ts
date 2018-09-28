@@ -1,6 +1,6 @@
 import { Opcode, notImplementedError } from "./common";
-import { IMachineState } from "../VM";
 import { BN } from "bn.js";
+import { IMachineState } from "../types";
 
 export class StopOpcode extends Opcode {
   static id = 0x00;
@@ -29,10 +29,22 @@ export class ReturnOpcode extends Opcode {
     const offset = state.stack.pop().toNumber();
     const size = state.stack.pop().toNumber();
 
-    const ret = new BN(state.memory.slice(offset, size));
+    const ret = state.memory.slice(offset, offset + size);
 
-    state.return = ret.toArray();
+    state.return = ret;
     state.stopped = true;
+  }
+}
+
+export class ReturnDataSizeOpcode extends Opcode {
+  static id = 0x3d;
+  static type = "RETURNDATASIZE";
+
+  run(state: IMachineState): void {
+    const lastReturnSize = state.lastReturned.length;
+
+    state.stack.push(new BN(lastReturnSize));
+    state.pc += 1;
   }
 }
 

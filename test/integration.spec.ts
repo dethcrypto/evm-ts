@@ -17,7 +17,7 @@ function loadContract(fullName: string): { bin: string; abi: any; contract: any;
   return { bin, abi, contract, instance };
 }
 
-describe("EMV-TS", () => {
+describe("integration", () => {
   it("should work", () => compareWithReferentialImpl("60606040523415600e"));
 
   it("should work with 'simple' contract", () => {
@@ -46,6 +46,7 @@ describe("EMV-TS", () => {
       })).accountCreated!;
 
       await vm.runTx({ to: callerAddress, data: caller.instance.performCall.getData().slice(2) });
+      await vm.runTx({ to: callerAddress, data: caller.instance.performCallAndSaveReturn.getData().slice(2) });
     });
   });
 });

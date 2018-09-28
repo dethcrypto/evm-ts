@@ -1,25 +1,18 @@
-import { expect } from "chai";
-import { BN } from "bn.js";
-
-import { VM } from "../VM";
-import * as opcodes from "../opcodes";
-
 /* tslint:disable */
 
 describe("VM", () => {
   // here we need some nice way to decode input into opcodes
   it.skip("should run simple program", () => {
-    const input = [new opcodes.PushOpcode(1, new BN(1)), new opcodes.PushOpcode(1, new BN(2)), new opcodes.AddOpcode()];
-    const expectedState = {
-      pc: 5,
-      stopped: true,
-      stack: [new BN(3)],
-      memory: [],
-    };
-
-    const bytecodeRunner = new VM();
-    bytecodeRunner.runCode();
-    expect(bytecodeRunner.state).to.deep.eq(expectedState);
+    // const input = [new opcodes.PushOpcode(1, new BN(1)), new opcodes.PushOpcode(1, new BN(2)), new opcodes.AddOpcode()];
+    // const expectedState = {
+    //   pc: 5,
+    //   stopped: true,
+    //   stack: [new BN(3)],
+    //   memory: [],
+    // };
+    // const bytecodeRunner = new VM();
+    // bytecodeRunner.runCode();
+    // expect(bytecodeRunner.state).to.deep.eq(expectedState);
   });
 
   it.skip("should clone state before passing it to opcodes", () => {

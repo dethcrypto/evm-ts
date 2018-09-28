@@ -4,10 +4,13 @@ import * as Trie from "merkle-patricia-tree";
 import * as Account from "ethereumjs-account";
 import * as utils from "ethereumjs-util";
 
-import { IEnvironment } from "../../lib/VM";
-import { IExternalTransaction, ITransactionResult } from "lib/FakeBlockchain";
 import invariant = require("invariant");
+import { IEnvironment, IExternalTransaction, ITransactionResult } from "lib/types";
 const keyPair = require("./keyPair");
+
+const publicKeyBuf = Buffer.from(keyPair.publicKey, "hex");
+export const commonAddress = utils.pubToAddress(publicKeyBuf, true);
+export const commonAddressString = commonAddress.toString("hex");
 
 export class EVMJS {
   private nonce = 0;
@@ -20,13 +23,10 @@ export class EVMJS {
 
   public async setup(): Promise<void> {
     return new Promise<void>(res => {
-      const publicKeyBuf = Buffer.from(keyPair.publicKey, "hex");
-      const address = utils.pubToAddress(publicKeyBuf, true);
-
       const account = new Account();
       account.balance = "0xf00000000000000001";
 
-      this.stateTrie.put(address, account.serialize(), res);
+      this.stateTrie.put(commonAddress, account.serialize(), res);
     });
   }
 
@@ -75,6 +75,7 @@ export class EVMJS {
       data: transaction.data,
       value: transaction.value,
       to: transaction.to,
+      caller: commonAddress,
       nonce,
       gasPrice: "0x09184e72a000",
       gasLimit: "0x90710",

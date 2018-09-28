@@ -1,8 +1,8 @@
 import { BN } from "bn.js";
 
 import { Opcode, DecodeError } from "./common";
-import { IMachineState } from "../VM";
 import { PeekableIterator } from "../utils/PeekableIterator";
+import { IMachineState } from "../types";
 
 /**
  * PUSH is a family of opcodes.

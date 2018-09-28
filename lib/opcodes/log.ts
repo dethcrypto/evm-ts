@@ -1,6 +1,6 @@
 import { Opcode, notImplementedError } from "./common";
-import { IMachineState } from "../VM";
 import { PeekableIterator } from "../utils/PeekableIterator";
+import { IMachineState } from "../types";
 
 /**
  * LOG is a family of opcodes.

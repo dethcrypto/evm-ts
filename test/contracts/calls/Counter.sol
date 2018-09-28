@@ -7,7 +7,11 @@ contract Counter {
     }
 
     function trigger() public {
-      counter += 0xfff;
+      counter += 1;
+    }
 
+    function triggerAndReturn() public returns(uint256) {
+      counter += 1;
+      return counter;
     }
 }
