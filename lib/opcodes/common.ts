@@ -1,4 +1,5 @@
-import { IMachineState, IEnvironment } from "../VM";
+import { VM } from "../VM";
+import { IMachineState, IEnvironment } from "../types";
 
 export abstract class Opcode {
   public id: number;
@@ -11,8 +12,10 @@ export abstract class Opcode {
   }
 
   // it should mutate input data. VM makes sure to clone them first
-  abstract run(state: IMachineState, env: IEnvironment): void;
+  abstract run(state: IMachineState, env: IEnvironment, vm: VM): void;
 }
+
+export const WORD_SIZE = 256;
 
 export class DecodeError extends Error {
   constructor(public readonly index: number, public readonly opcode: string) {

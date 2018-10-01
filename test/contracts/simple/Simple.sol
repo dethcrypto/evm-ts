@@ -1,8 +1,13 @@
 pragma solidity ^0.4.17;
 
-contract DumbContract {
+/** 
+Tests:
+  - method calls
+  - persistent storage
+*/
+contract Simple {
     uint256 a;
-    function C() {
+    constructor() public {
       a = 666;
     }
 

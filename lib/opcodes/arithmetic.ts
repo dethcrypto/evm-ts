@@ -1,7 +1,8 @@
-import { Opcode } from "./common";
-import { IMachineState } from "../VM";
-import { MAX_UINT_256 } from "../utils/bytes";
 import { BN } from "bn.js";
+
+import { Opcode } from "./common";
+import { MAX_UINT_256 } from "../utils/bytes";
+import { IMachineState } from "lib/types";
 
 export class AddOpcode extends Opcode {
   static id = 0x01;
@@ -57,6 +58,21 @@ export class DivOpcode extends Opcode {
     const arg2 = state.stack.pop();
 
     const result = arg1.div(arg2).mod(MAX_UINT_256);
+
+    state.pc += 1;
+    state.stack.push(result);
+  }
+}
+
+export class ExpOpcode extends Opcode {
+  static id = 0x0a;
+  static type = "EXP";
+
+  run(state: IMachineState): void {
+    const arg1 = state.stack.pop();
+    const arg2 = state.stack.pop();
+
+    const result = arg1.pow(arg2).mod(MAX_UINT_256);
 
     state.pc += 1;
     state.stack.push(result);

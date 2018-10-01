@@ -10,3 +10,4 @@ export * from "./other";
 export * from "./dup";
 export * from "./log";
 export * from "./swap";
+export * from "./calls";

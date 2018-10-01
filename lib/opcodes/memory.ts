@@ -1,7 +1,8 @@
-import { IMachineState, IEnvironment } from "../VM";
+import { BN } from "bn.js";
+
 import { Opcode } from "./common";
 import { arrayCopy } from "../utils/arrays";
-import { BN } from "bn.js";
+import { IMachineState, IEnvironment } from "../types";
 
 /**
  * Stores full word in memory.
@@ -53,7 +54,7 @@ export class CodeCopyOpcode extends Opcode {
     const codeOffset = state.stack.pop().toNumber();
     const length = state.stack.pop().toNumber();
 
-    const codeToCopy = env.code.slice(codeOffset, codeOffset + length);
+    const codeToCopy = env.account.code.slice(codeOffset, codeOffset + length);
 
     const newMemory = arrayCopy(state.memory, codeToCopy, memOffset);
 

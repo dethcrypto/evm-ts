@@ -1,30 +1,11 @@
-import { BN } from "bn.js";
 import StrictEventEmitter from "strict-event-emitter-types";
-import { Dictionary } from "ts-essentials";
 
 import { Stack } from "./utils/Stack";
-import { DeepReadonly } from "../@types/std";
 import { decodeOpcode } from "./decodeBytecode";
 import { PeekableIterator } from "./utils/PeekableIterator";
 import { EventEmitter } from "events";
-import { Opcode } from "./opcodes/common";
-
-export type TStorage = Dictionary<string>;
-
-export interface IMachineState {
-  pc: number;
-  stack: Stack<BN>;
-  memory: number[];
-  storage: TStorage;
-  stopped: boolean;
-  return?: ReadonlyArray<number>;
-}
-
-export type IEnvironment = DeepReadonly<{
-  value: BN;
-  data: number[];
-  code: number[];
-}>;
+import { merge } from "lodash";
+import { IEnvironment, IMachineState, IVmEvents, IBlockchain } from "./types";
 
 const initialState: IMachineState = {
   pc: 0,
@@ -32,80 +13,54 @@ const initialState: IMachineState = {
   memory: [],
   storage: {},
   stopped: false,
+  lastReturned: [],
 };
-
-const initialEnvironment: IEnvironment = {
-  value: new BN(0),
-  code: [],
-  data: [],
-};
-
-export interface IStepContext {
-  previousState: IMachineState;
-  currentOpcode: Opcode;
-}
-
-interface IVmEvents {
-  step: IStepContext;
-}
 
 const VmEventsEmitter: { new (): StrictEventEmitter<EventEmitter, IVmEvents> } = EventEmitter as any;
 
 export class VM extends VmEventsEmitter {
-  private environment: IEnvironment = initialEnvironment;
-  private codeIterator?: PeekableIterator<number>;
-
-  constructor(public state = deepCloneState(initialState)) {
+  constructor(public blockchain: IBlockchain) {
     super();
   }
 
-  private step(): void {
-    if (this.state.stopped) {
-      throw new Error("Machine stopped!");
-    }
-    if (!this.environment.code || !this.codeIterator) {
-      throw new Error("No code to execute");
-    }
-    if (!this.environment) {
-      throw new Error("No environment to execute");
-    }
+  runCode(environment: IEnvironment): { state: IMachineState } {
+    const account = environment.account;
+    const codeIterator = new PeekableIterator(account.code);
+    let state = merge({}, deepCloneState(initialState), { storage: account.storage });
 
-    // opcodes mutate states so we deep clone it first
-    const newState = deepCloneState(this.state);
+    while (!state.stopped) {
+      // opcodes mutate states so we deep clone it first
+      const newState = deepCloneState(state);
 
-    if (this.state.pc >= this.environment.code.length) {
-      newState.stopped = true;
-      this.state = newState;
-      return;
-    }
+      const isFinished = state.pc >= account.code.length;
+      if (isFinished) {
+        newState.stopped = true;
+        state = newState;
+        break;
+      }
 
-    this.codeIterator.index = this.state.pc;
-    const opcode = decodeOpcode(this.codeIterator);
+      codeIterator.index = state.pc;
+      const opcode = decodeOpcode(codeIterator);
 
-    this.emit("step", { currentOpcode: opcode, previousState: this.state });
+      this.emit("step", { currentOpcode: opcode, previousState: state, previousEnv: environment, vm: this });
 
-    try {
-      opcode.run(newState, this.environment);
-    } catch (e) {
-      throw new Error(`Error while running ${opcode.type} at position ${this.state.pc}: ${e.message}`);
-    }
-    this.state = newState;
-  }
-
-  runCode(environment: Partial<IEnvironment> = initialEnvironment, storage?: TStorage): { state: IMachineState } {
-    this.environment = { ...initialEnvironment, ...environment, value: environment.value || initialEnvironment.value };
-    this.codeIterator = new PeekableIterator(this.environment.code);
-    this.state = deepCloneState(initialState);
-    if (storage) {
-      this.state.storage = storage;
+      try {
+        opcode.run(newState, environment, this);
+      } catch (e) {
+        // just for debugging purposes
+        if (environment.depth !== 0) {
+          throw e;
+        }
+        throw new Error(`Error while running ${opcode.type} at position ${state.pc}: ${e.message}`);
+      }
+      state = newState;
     }
 
-    while (!this.state.stopped) {
-      this.step();
-    }
+    // finally update storage
+    account.storage = state.storage;
 
     return {
-      state: this.state,
+      state,
     };
   }
 }
@@ -117,5 +72,6 @@ function deepCloneState(state: IMachineState): IMachineState {
     stack: new Stack(state.stack),
     memory: [...state.memory],
     storage: { ...state.storage },
+    lastReturned: [...state.lastReturned],
   };
 }

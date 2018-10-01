@@ -1,7 +1,7 @@
 import { Opcode } from "./common";
-import { IMachineState } from "../VM";
 import { PeekableIterator } from "../utils/PeekableIterator";
 import { getIndex } from "../utils/arrays";
+import { IMachineState } from "../types";
 
 /**
  * DUP is a family of opcodes.

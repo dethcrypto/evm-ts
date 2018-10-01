@@ -1,5 +1,5 @@
 import { Opcode } from "./common";
-import { IMachineState, IEnvironment } from "../VM";
+import { IMachineState, IEnvironment } from "../types";
 
 export class JumpOpcode extends Opcode {
   static id = 0x56;
@@ -9,7 +9,7 @@ export class JumpOpcode extends Opcode {
     const jumpDestinationRaw = state.stack.pop();
     const jumpDestination = jumpDestinationRaw.toNumber();
 
-    const isValidJumpTarget = env.code[jumpDestination] === JumpDestOpcode.id;
+    const isValidJumpTarget = env.account.code[jumpDestination] === JumpDestOpcode.id;
     if (!isValidJumpTarget) {
       throw new Error(`Trying to jump to ${jumpDestination} which is not JUMPDEST opcode.`);
     }

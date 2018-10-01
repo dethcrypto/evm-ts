@@ -4,13 +4,17 @@ import * as Trie from "merkle-patricia-tree";
 import * as Account from "ethereumjs-account";
 import * as utils from "ethereumjs-util";
 
-import { IEnvironment } from "../../lib/VM";
+import invariant = require("invariant");
+import { IEnvironment, IExternalTransaction, ITransactionResult } from "lib/types";
 const keyPair = require("./keyPair");
+
+const publicKeyBuf = Buffer.from(keyPair.publicKey, "hex");
+export const commonAddress = utils.pubToAddress(publicKeyBuf, true);
+export const commonAddressString = commonAddress.toString("hex");
 
 export class EVMJS {
   private nonce = 0;
   public readonly vm: any;
-  private lastDeployedAddress?: string;
   private stateTrie = new Trie();
 
   constructor() {
@@ -19,13 +23,10 @@ export class EVMJS {
 
   public async setup(): Promise<void> {
     return new Promise<void>(res => {
-      const publicKeyBuf = Buffer.from(keyPair.publicKey, "hex");
-      const address = utils.pubToAddress(publicKeyBuf, true);
-
       const account = new Account();
       account.balance = "0xf00000000000000001";
 
-      this.stateTrie.put(address, account.serialize(), res);
+      this.stateTrie.put(commonAddress, account.serialize(), res);
     });
   }
 
@@ -37,7 +38,6 @@ export class EVMJS {
         this.vm.runCode(
           {
             code: Buffer.from(code, "hex"),
-            // data: Buffer.from("0x0", "hex"),
             data,
             value: env.value,
             gasLimit: Buffer.from("ffffffff", "hex"),
@@ -57,18 +57,25 @@ export class EVMJS {
     });
   }
 
-  public async runTx(data: string, env?: Partial<IEnvironment>): Promise<any> {
-    if (!data.startsWith("0x")) {
-      return this.runTx("0x" + data, env);
+  public async runTx(transaction: IExternalTransaction): Promise<ITransactionResult> {
+    invariant(transaction.data, "Tx data is required");
+
+    if (!transaction.data!.startsWith("0x")) {
+      return this.runTx({
+        data: "0x" + transaction.data!,
+        to: transaction.to,
+        value: transaction.value,
+      });
     }
 
     const nonce = "0x" + this.nonce.toString(16);
     this.nonce += 1; // advance nonce for next tx;
 
     const tx = new Transaction({
-      data,
-      value: env && env.value,
-      to: this.lastDeployedAddress,
+      data: transaction.data,
+      value: transaction.value,
+      to: transaction.to,
+      caller: commonAddress,
       nonce,
       gasPrice: "0x09184e72a000",
       gasLimit: "0x90710",
@@ -88,12 +95,12 @@ export class EVMJS {
               return;
             }
 
-            if (results.createdAddress) {
-              // tslint:disable-next-line
-              this.lastDeployedAddress = "0x" + results.createdAddress.toString("hex");
-            }
-
-            resolve(results);
+            // @todo translating evmjs result to our internal type is not fully done
+            resolve({
+              account: {},
+              runState: {},
+              accountCreated: results.createdAddress && `0x${results.createdAddress.toString("hex")}`,
+            });
           },
         );
       } catch (e) {

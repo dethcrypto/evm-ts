@@ -1,6 +1,6 @@
-import { IMachineState } from "../VM";
 import { Opcode } from "./common";
 import { BN } from "bn.js";
+import { IMachineState } from "../types";
 
 /**
  * Stores full word in storage.

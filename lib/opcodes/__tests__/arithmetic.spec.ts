@@ -51,4 +51,8 @@ describe("arithmetic opcodes", () => {
 
     it("eq2", () => compareWithReferentialImpl("6001600214"));
   });
+
+  describe("EXP", () => {
+    it("exp", () => compareWithReferentialImpl("600160020a"));
+  });
 });
