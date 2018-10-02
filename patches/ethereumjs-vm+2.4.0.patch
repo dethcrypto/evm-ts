@@ -1,0 +1,14 @@
+patch-package
+--- a/node_modules/ethereumjs-vm/dist/runCode.js
++++ b/node_modules/ethereumjs-vm/dist/runCode.js
+@@ -132,7 +132,9 @@ module.exports = function (opts, cb) {
+         address: runState.address,
+         account: runState.contract,
+         cache: runState.stateManager.cache,
+-        memory: runState.memory
++        memory: runState.memory,
++        code: runState.code,
++        data: runState.callData
+       };
+       self.emit('step', eventObj, cb);
+     }

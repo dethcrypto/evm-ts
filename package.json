@@ -4,6 +4,7 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
+    "prepare": "patch-package",
     "compile-solidity": "solcjs ./test/contracts/simple/*.sol --bin --abi -o ./test/contracts-compiled/simple --overwrite && solcjs ./test/contracts/calls/*.sol --bin --abi -o ./test/contracts-compiled/calls --overwrite && solcjs ./test/contracts/various-calls/*.sol --bin --abi -o ./test/contracts-compiled/various-calls --overwrite",
     "format": "prettier --list-different '**/*.{ts,json,md, gql}'",
     "format:fix": "prettier --write '**/*.{ts,json,md,gql}'",
@@ -48,6 +49,7 @@
     "merkle-patricia-tree": "^2.3.2",
     "mocha": "^5.2.0",
     "nyc": "^13.0.1",
+    "patch-package": "^5.1.1",
     "rlp": "^2.1.0",
     "strict-event-emitter-types": "^2.0.0",
     "ts-node": "^6.0.5",
