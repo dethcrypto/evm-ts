@@ -9,6 +9,7 @@ export class CallOpcode extends Opcode {
   static type = "CALL";
 
   run(state: IMachineState, env: IEnvironment, vm: VM): void {
+    //tslint:disable-next-line
     const _gas = state.stack.pop();
     const addr = state.stack.pop();
     const value = state.stack.pop();
@@ -21,20 +22,22 @@ export class CallOpcode extends Opcode {
     const data = state.memory.slice(inOffset, inOffset + inSize);
 
     let callState: IMachineState;
-    try {
-      const runCodeResult = vm.runCode({ account, value, data, depth: env.depth + 1 });
-      callState = runCodeResult.state;
+    // try {
+    const runCodeResult = vm.runCode({ account, caller: env.account, value, data, depth: env.depth + 1 });
+    callState = runCodeResult.state;
 
-      state.stack.push(new BN(1));
+    state.stack.push(new BN(1));
 
-      const returnValue = sliceAndEnsureLength(callState.return || [], 0, retSize, 0);
-      const newMemory = arrayCopy(state.memory, returnValue, retOffset);
+    const returnValue = sliceAndEnsureLength(callState.return || [], 0, retSize, 0);
+    const newMemory = arrayCopy(state.memory, returnValue, retOffset);
 
-      state.lastReturned = callState.return || [];
-      state.memory = newMemory;
-    } catch (e) {
-      state.stack.push(new BN(0));
-    }
+    state.lastReturned = callState.return || [];
+    state.memory = newMemory;
+    // @todo error checking
+    // } catch (e) {
+    //   console.error(e);
+    //   state.stack.push(new BN(0));
+    // }
 
     state.pc += 1;
   }

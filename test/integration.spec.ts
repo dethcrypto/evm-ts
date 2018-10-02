@@ -49,4 +49,20 @@ describe("integration", () => {
       await vm.runTx({ to: callerAddress, data: caller.instance.performCallAndSaveReturn.getData().slice(2) });
     });
   });
+
+  it("should work with 'various-calls' contracts", () => {
+    const Caller = loadContract("various-calls/Caller");
+    const Code = loadContract("various-calls/Code");
+
+    return compareTransactionsWithReferentialImpl(async vm => {
+      const codeAddress = (await vm.runTx({ data: Code.bin })).accountCreated!;
+
+      const callerConstructorData = Caller.contract.new.getData(codeAddress, { data: Caller.bin });
+      const callerAddress = (await vm.runTx({
+        data: callerConstructorData,
+      })).accountCreated!;
+
+      await vm.runTx({ to: callerAddress, data: Caller.instance.callSetN.getData(123).slice(2) });
+    });
+  });
 });

@@ -48,7 +48,8 @@ export class VM extends VmEventsEmitter {
         opcode.run(newState, environment, this);
       } catch (e) {
         // just for debugging purposes
-        if (environment.depth !== 0) {
+        // @todo we can do better by wrapping any errors in listeners and pushing them forward
+        if (environment.depth !== 0 || e.showDiff) {
           throw e;
         }
         throw new Error(`Error while running ${opcode.type} at position ${state.pc}: ${e.message}`);

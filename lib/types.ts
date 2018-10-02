@@ -65,6 +65,7 @@ export interface ITransactionResult {
 
 export type IEnvironment = {
   account: IAccount;
+  caller: IAccount;
   data: ReadonlyArray<number>;
   value: BN;
   depth: number;

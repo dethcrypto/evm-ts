@@ -166,6 +166,13 @@ export function runEvm(bytecode: string, env?: Partial<IEnvironment>): IMachineS
       storage: {},
       code: byteStringToNumberArray(bytecode),
     },
+    caller: {
+      address: commonAddressString,
+      nonce: 0,
+      value: new BN(0),
+      storage: {},
+      code: byteStringToNumberArray(bytecode),
+    },
     depth: 0,
     ...env,
   });

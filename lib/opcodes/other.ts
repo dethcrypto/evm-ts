@@ -1,3 +1,4 @@
+import { keccak256 } from "ethereumjs-util";
 import { Opcode, notImplementedError } from "./common";
 import { BN } from "bn.js";
 import { IMachineState } from "../types";
@@ -61,7 +62,15 @@ export class Sha3Opcode extends Opcode {
   static id = 0x20;
   static type = "SHA3";
 
-  run(_state: IMachineState): void {
-    notImplementedError();
+  run(state: IMachineState): void {
+    const memoryOffset = state.stack.pop().toNumber();
+    const memorySize = state.stack.pop().toNumber();
+
+    const data = state.memory.slice(memoryOffset, memoryOffset + memorySize);
+
+    const result = keccak256(data);
+
+    state.stack.push(new BN(result));
+    state.pc += 1;
   }
 }

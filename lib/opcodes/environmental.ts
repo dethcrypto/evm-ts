@@ -75,3 +75,15 @@ export class GasOpcode extends Opcode {
     state.pc += 1;
   }
 }
+
+export class CallerOpcode extends Opcode {
+  static id = 0x33;
+  static type = "CALLER";
+
+  run(state: IMachineState, env: IEnvironment): void {
+    const address = new BN(env.caller.address, 16);
+
+    state.stack.push(address);
+    state.pc += 1;
+  }
+}

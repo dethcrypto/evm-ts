@@ -65,6 +65,7 @@ export class FakeBlockchain implements IBlockchain {
 
     const result = this.vm.runCode({
       account: { ...account, code: codeToExecute! },
+      caller: fromAccount,
       data: tx.data!,
       value: tx.value!,
       depth: 0,
