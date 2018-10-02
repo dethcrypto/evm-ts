@@ -9,7 +9,7 @@ export class JumpOpcode extends Opcode {
     const jumpDestinationRaw = state.stack.pop();
     const jumpDestination = jumpDestinationRaw.toNumber();
 
-    const isValidJumpTarget = env.account.code[jumpDestination] === JumpDestOpcode.id;
+    const isValidJumpTarget = env.code[jumpDestination] === JumpDestOpcode.id;
     if (!isValidJumpTarget) {
       throw new Error(`Trying to jump to ${jumpDestination} which is not JUMPDEST opcode.`);
     }

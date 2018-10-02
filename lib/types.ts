@@ -66,8 +66,8 @@ export interface ITransactionResult {
 export type IEnvironment = {
   account: IAccount;
   caller: IAccount;
+  code: ReadonlyArray<number>;
   data: ReadonlyArray<number>;
   value: BN;
   depth: number;
-  // @todo we miss code here b/c we cannot use account.code during deployment andd tis really just a context account
 };

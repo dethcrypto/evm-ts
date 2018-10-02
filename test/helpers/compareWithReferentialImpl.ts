@@ -42,6 +42,8 @@ interface IEqualState {
   memory: string;
   pc: number;
   address: string;
+  code: string;
+  data: string;
 }
 
 interface IVm {
@@ -82,11 +84,12 @@ export async function compareTransactionsWithReferentialImpl(script: (vm: IVm) =
   const evmJsStepListener = (data: any) => {
     getLastElement(evmJsStates).push({
       opcode: data.opcode.name,
-      // address: data.address.toString("hex"),
       stack: data.stack.toString(),
       memory: data.memory.toString(),
       pc: data.pc,
       address: data.address.toString("hex"),
+      code: [...data.code].toString(),
+      data: data.data.length === 1 ? "" : [...data.data].toString(), // otherwise empty buffer gets serialized to string incorrectly
     });
   };
   evmJs.vm.on("step", evmJsStepListener);
@@ -98,8 +101,9 @@ export async function compareTransactionsWithReferentialImpl(script: (vm: IVm) =
       stack: ctx.previousState.stack.toString(),
       memory: ctx.previousState.memory.toString(),
       pc: ctx.previousState.pc,
-      // code: ctx.vm.blockchain.getAddress(ctx.previousEnv.account.address).code, // @todo we cannot use account.code b/c it's not set correctly during contract deployment
       address: ctx.previousEnv.account.address,
+      code: ctx.previousEnv.code.toString(),
+      data: ctx.previousEnv.data.toString(),
     });
 
     //we can already compare states here:
@@ -173,6 +177,7 @@ export function runEvm(bytecode: string, env?: Partial<IEnvironment>): IMachineS
       storage: {},
       code: byteStringToNumberArray(bytecode),
     },
+    code: byteStringToNumberArray(bytecode),
     depth: 0,
     ...env,
   });

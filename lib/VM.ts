@@ -25,14 +25,16 @@ export class VM extends VmEventsEmitter {
 
   runCode(environment: IEnvironment): { state: IMachineState } {
     const account = environment.account;
-    const codeIterator = new PeekableIterator(account.code);
+    const code = environment.code;
+
+    const codeIterator = new PeekableIterator(code);
     let state = merge({}, deepCloneState(initialState), { storage: account.storage });
 
     while (!state.stopped) {
       // opcodes mutate states so we deep clone it first
       const newState = deepCloneState(state);
 
-      const isFinished = state.pc >= account.code.length;
+      const isFinished = state.pc >= code.length;
       if (isFinished) {
         newState.stopped = true;
         state = newState;

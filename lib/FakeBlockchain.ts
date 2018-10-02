@@ -61,18 +61,18 @@ export class FakeBlockchain implements IBlockchain {
     const account = deployingNewContract ? this.createNewAccount(fromAccount) : this.getAddress(tx.to!);
     invariant(account, `Account ${tx.to} not found!`);
 
-    const codeToExecute = deployingNewContract ? tx.data : account.code;
+    const codeToExecute = (deployingNewContract ? tx.data : account.code)!;
+    const dataToSend = (deployingNewContract ? [] : tx.data)!;
 
     const result = this.vm.runCode({
-      account: { ...account, code: codeToExecute! },
+      account: account,
       caller: fromAccount,
-      data: tx.data!,
+      code: codeToExecute,
+      data: dataToSend,
       value: tx.value!,
       depth: 0,
-    }); // passing code here is WRONG!
+    });
 
-    // @todo remove it when account passing above is fixed (and it's the same account instance all the way down)
-    account.storage = result.state.storage;
     if (deployingNewContract) {
       invariant(result.state.return, "Contract deploy should RETURN code!");
       account.code = result.state.return!;
