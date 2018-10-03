@@ -64,6 +64,7 @@ describe("integration", () => {
 
       await vm.runTx({ to: callerAddress, data: Caller.instance.callSetN.getData(123).slice(2) });
       await vm.runTx({ to: callerAddress, data: Caller.instance.delegatecallSetN.getData(123).slice(2) });
+      await vm.runTx({ to: callerAddress, data: Caller.instance.callcodeSetN.getData(5).slice(2) });
     });
   });
 });

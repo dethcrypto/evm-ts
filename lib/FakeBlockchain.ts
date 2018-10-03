@@ -9,7 +9,7 @@ import { isString } from "util";
 
 export class FakeBlockchain implements IBlockchain {
   public readonly vm = new VM(this);
-  private accounts: Dictionary<IAccount> = {};
+  public accounts: Dictionary<IAccount> = {};
 
   public getAddress(_address: string): IAccount {
     const address = _address.startsWith("0x") ? _address.slice(2) : _address;
