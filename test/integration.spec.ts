@@ -65,6 +65,8 @@ describe("integration", () => {
       await vm.runTx({ to: callerAddress, data: Caller.instance.callSetN.getData(1, false).slice(2) });
       await vm.runTx({ to: callerAddress, data: Caller.instance.delegatecallSetN.getData(2, false).slice(2) });
       await vm.runTx({ to: callerAddress, data: Caller.instance.callcodeSetN.getData(3, false).slice(2) });
+      await vm.runTx({ to: callerAddress, data: Caller.instance.solCallSetN.getData(4, false).slice(2) });
+      await vm.runTx({ to: callerAddress, data: Caller.instance.trampoline.getData(5, false).slice(2) });
     });
   });
 
@@ -83,6 +85,8 @@ describe("integration", () => {
       await vm.runTx({ to: callerAddress, data: Caller.instance.callSetN.getData(1, true).slice(2) });
       await vm.runTx({ to: callerAddress, data: Caller.instance.delegatecallSetN.getData(2, true).slice(2) });
       await vm.runTx({ to: callerAddress, data: Caller.instance.callcodeSetN.getData(3, true).slice(2) });
+      await vm.runTx({ to: callerAddress, data: Caller.instance.solCallSetN.getData(4, true).slice(2) });
+      await vm.runTx({ to: callerAddress, data: Caller.instance.trampoline.getData(5, true).slice(2) });
     });
   });
 });

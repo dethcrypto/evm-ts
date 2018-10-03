@@ -83,7 +83,7 @@ export class EVMJS {
       caller: commonAddress,
       nonce,
       gasPrice: "0x09184e72a000",
-      gasLimit: "0x90710",
+      gasLimit: "0x900710",
     });
 
     tx.sign(Buffer.from(keyPair.secretKey, "hex"));

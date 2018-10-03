@@ -87,3 +87,15 @@ export class CallerOpcode extends Opcode {
     state.pc += 1;
   }
 }
+
+export class AddressOpcode extends Opcode {
+  static id = 0x30;
+  static type = "ADDRESS";
+
+  run(state: IMachineState, env: IEnvironment): void {
+    const address = new BN(env.account.address, 16);
+
+    state.stack.push(address);
+    state.pc += 1;
+  }
+}

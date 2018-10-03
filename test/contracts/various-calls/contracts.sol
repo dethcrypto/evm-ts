@@ -12,15 +12,27 @@ contract Caller {
   }
 
   function callSetN(uint _n, bool _revert) public returns (bool) {
-    return address(code).call(bytes4(keccak256("setN(uint256,bool)")), _n, _revert); // E's storage is set, D is not modified 
+    return address(code).call(bytes4(keccak256("setN(uint256,bool)")), _n, _revert); // Code's storage is set, Caller is not modified 
   }
 
   function callcodeSetN(uint _n, bool _revert) public returns (bool) {
-    return address(code).callcode(bytes4(keccak256("setN(uint256,bool)")), _n, _revert); // D's storage is set, E is not modified 
+    return address(code).callcode(bytes4(keccak256("setN(uint256,bool)")), _n, _revert); // Code's storage is set, Caller is not modified 
   }
 
   function delegatecallSetN(uint _n, bool _revert) public returns (bool) {
-    return address(code).delegatecall(bytes4(keccak256("setN(uint256,bool)")), _n, _revert); // D's storage is set, E is not modified 
+    return address(code).delegatecall(bytes4(keccak256("setN(uint256,bool)")), _n, _revert); // Code's storage is set, Caller is not modified 
+  }
+
+  // this is mostly useful for testing reverts
+  function solCallSetN(uint _n, bool _revert) public {
+    sender = msg.sender;
+    code.setN(_n, _revert);
+  }
+
+  // tests mutual access during call
+  function trampoline(uint _n, bool _revert) public {
+    n += _n;
+    code.setNFromCaller(this, _revert);
   }
 }
 
@@ -36,6 +48,14 @@ contract Code {
 
     // the value of "this" is D, when invoked by either D's callcodeSetN or C.foo()
 
+    if (_revert) {
+      revert();
+    }
+  }
+
+  function setNFromCaller(Caller caller, bool _revert) public {
+    n = caller.n();
+    
     if (_revert) {
       revert();
     }
