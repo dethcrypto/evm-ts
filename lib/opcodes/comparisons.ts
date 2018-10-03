@@ -1,6 +1,6 @@
 import { Opcode, WORD_SIZE } from "./common";
 import { BN } from "bn.js";
-import { IMachineState } from "lib/types";
+import { IMachineState } from "../types";
 
 export class LessThanOpcode extends Opcode {
   static id = 0x10;

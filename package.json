@@ -10,7 +10,7 @@
     "format:fix": "prettier --write '**/*.{ts,json,md,gql}'",
     "tslint": "tslint -p ./tsconfig.json -e 'node_modules/**/*' -e '**/node_modules/**/*' '**/*.ts'",
     "tslint:fix": "tslint --fix --format stylish -p ./tsconfig.json -e 'node_modules/**/*' -e '**/node_modules/**/*' '**/*.ts'",
-    "tsc": "tsc --noEmit",
+    "tsc": "tsc --noEmit && tsc --project ./tsconfig.prod.json --noEmit",
     "lint": "yarn format && yarn tslint && yarn tsc",
     "lint:fix": "yarn format:fix && yarn tslint:fix && yarn tsc",
     "test": "yarn lint && yarn test:mocha",
