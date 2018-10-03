@@ -9,10 +9,11 @@ import { IEnvironment, IMachineState, IVmEvents, IBlockchain } from "./types";
 
 const initialState: IMachineState = {
   pc: 0,
+  stopped: false,
+  reverted: false,
   stack: new Stack(),
   memory: [],
   storage: {},
-  stopped: false,
   lastReturned: [],
 };
 
@@ -72,6 +73,7 @@ function deepCloneState(state: IMachineState): IMachineState {
   return {
     pc: state.pc,
     stopped: state.stopped,
+    reverted: state.reverted,
     stack: new Stack(state.stack),
     memory: [...state.memory],
     storage: { ...state.storage },

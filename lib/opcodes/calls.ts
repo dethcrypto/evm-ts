@@ -21,9 +21,7 @@ export class CallOpcode extends Opcode {
     const account = vm.blockchain.getAddress(addr.toString(16));
     const data = state.memory.slice(inOffset, inOffset + inSize);
 
-    let callState: IMachineState;
-    // try {
-    const runCodeResult = vm.runCode({
+    const { state: callState } = vm.runCode({
       account,
       caller: env.account,
       code: account.code,
@@ -31,20 +29,20 @@ export class CallOpcode extends Opcode {
       data,
       depth: env.depth + 1,
     });
-    callState = runCodeResult.state;
 
-    state.stack.push(new BN(1));
+    const hasErrored = callState.reverted || !callState.stopped;
+    if (hasErrored) {
+      state.stack.push(new BN(0));
+      state.lastReturned = [];
+    } else {
+      state.stack.push(new BN(1));
 
-    const returnValue = sliceAndEnsureLength(callState.return || [], 0, retSize, 0);
-    const newMemory = arrayCopy(state.memory, returnValue, retOffset);
+      const returnValue = sliceAndEnsureLength(callState.return || [], 0, retSize, 0);
+      const newMemory = arrayCopy(state.memory, returnValue, retOffset);
 
-    state.lastReturned = callState.return || [];
-    state.memory = newMemory;
-    // @todo error checking
-    // } catch (e) {
-    //   console.error(e);
-    //   state.stack.push(new BN(0));
-    // }
+      state.lastReturned = callState.return || [];
+      state.memory = newMemory;
+    }
 
     state.pc += 1;
   }
@@ -66,9 +64,7 @@ export class DelegateCallOpcode extends Opcode {
     const account = vm.blockchain.getAddress(addr.toString(16));
     const data = state.memory.slice(inOffset, inOffset + inSize);
 
-    let callState: IMachineState;
-    // try {
-    const runCodeResult = vm.runCode({
+    const { state: callState } = vm.runCode({
       account: env.account,
       caller: env.caller,
       code: account.code,
@@ -76,21 +72,21 @@ export class DelegateCallOpcode extends Opcode {
       data,
       depth: env.depth + 1,
     });
-    callState = runCodeResult.state;
 
-    state.stack.push(new BN(1));
+    const hasErrored = callState.reverted || !callState.stopped;
+    if (hasErrored) {
+      state.stack.push(new BN(0));
+      state.lastReturned = [];
+    } else {
+      state.stack.push(new BN(1));
 
-    const returnValue = sliceAndEnsureLength(callState.return || [], 0, retSize, 0);
-    const newMemory = arrayCopy(state.memory, returnValue, retOffset);
+      const returnValue = sliceAndEnsureLength(callState.return || [], 0, retSize, 0);
+      const newMemory = arrayCopy(state.memory, returnValue, retOffset);
 
-    state.lastReturned = callState.return || [];
-    state.memory = newMemory;
-    state.storage = callState.storage;
-    // @todo error checking
-    // } catch (e) {
-    //   console.error(e);
-    //   state.stack.push(new BN(0));
-    // }
+      state.lastReturned = callState.return || [];
+      state.memory = newMemory;
+      state.storage = callState.storage;
+    }
 
     state.pc += 1;
   }
@@ -113,9 +109,7 @@ export class CallCodeOpcode extends Opcode {
     const account = vm.blockchain.getAddress(addr.toString(16));
     const data = state.memory.slice(inOffset, inOffset + inSize);
 
-    let callState: IMachineState;
-    // try {
-    const runCodeResult = vm.runCode({
+    const { state: callState } = vm.runCode({
       account: env.account,
       caller: env.account,
       code: account.code,
@@ -123,21 +117,21 @@ export class CallCodeOpcode extends Opcode {
       data,
       depth: env.depth + 1,
     });
-    callState = runCodeResult.state;
 
-    state.stack.push(new BN(1));
+    const hasErrored = callState.reverted || !callState.stopped;
+    if (hasErrored) {
+      state.stack.push(new BN(0));
+      state.lastReturned = [];
+    } else {
+      state.stack.push(new BN(1));
 
-    const returnValue = sliceAndEnsureLength(callState.return || [], 0, retSize, 0);
-    const newMemory = arrayCopy(state.memory, returnValue, retOffset);
+      const returnValue = sliceAndEnsureLength(callState.return || [], 0, retSize, 0);
+      const newMemory = arrayCopy(state.memory, returnValue, retOffset);
 
-    state.lastReturned = callState.return || [];
-    state.memory = newMemory;
-    state.storage = callState.storage;
-    // @todo error checking
-    // } catch (e) {
-    //   console.error(e);
-    //   state.stack.push(new BN(0));
-    // }
+      state.lastReturned = callState.return || [];
+      state.memory = newMemory;
+      state.storage = callState.storage;
+    }
 
     state.pc += 1;
   }

@@ -28,6 +28,7 @@ export interface IMachineState {
   memory: number[];
   storage: TStorage;
   stopped: boolean;
+  reverted: boolean;
   return?: ReadonlyArray<number>;
   lastReturned: ReadonlyArray<number>; // EIP-211
 }

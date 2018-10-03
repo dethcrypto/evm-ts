@@ -18,7 +18,7 @@ export class RevertOpcode extends Opcode {
 
   run(state: IMachineState): void {
     state.stopped = true;
-    // @todo: proper impl
+    state.reverted = true;
   }
 }
 
