@@ -6,6 +6,7 @@ import { PeekableIterator } from "./utils/PeekableIterator";
 import { EventEmitter } from "events";
 import { merge } from "lodash";
 import { IEnvironment, IMachineState, IVmEvents, IBlockchain } from "./types";
+import { LayeredMap } from "./utils/LayeredMap";
 
 const initialState: IMachineState = {
   pc: 0,
@@ -13,7 +14,7 @@ const initialState: IMachineState = {
   reverted: false,
   stack: new Stack(),
   memory: [],
-  storage: {},
+  storage: new LayeredMap(),
   lastReturned: [],
 };
 
@@ -76,7 +77,7 @@ function deepCloneState(state: IMachineState): IMachineState {
     reverted: state.reverted,
     stack: new Stack(state.stack),
     memory: [...state.memory],
-    storage: { ...state.storage },
+    storage: state.storage.clone(),
     lastReturned: [...state.lastReturned],
   };
 }

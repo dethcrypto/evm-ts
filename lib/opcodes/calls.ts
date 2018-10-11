@@ -22,7 +22,10 @@ export class CallOpcode extends Opcode {
     const data = state.memory.slice(inOffset, inOffset + inSize);
 
     const { state: callState } = vm.runCode({
-      account,
+      account: {
+        ...account,
+        storage: account.storage.checkpoint(),
+      },
       caller: env.account,
       code: account.code,
       value,
@@ -32,11 +35,13 @@ export class CallOpcode extends Opcode {
 
     const hasErrored = callState.reverted || !callState.stopped;
     if (hasErrored) {
+      callState.storage.revert();
       state.stack.push(new BN(0));
       state.lastReturned = [];
     } else {
       state.stack.push(new BN(1));
 
+      callState.storage.commit();
       const returnValue = sliceAndEnsureLength(callState.return || [], 0, retSize, 0);
       const newMemory = arrayCopy(state.memory, returnValue, retOffset);
 
@@ -75,10 +80,12 @@ export class DelegateCallOpcode extends Opcode {
 
     const hasErrored = callState.reverted || !callState.stopped;
     if (hasErrored) {
+      callState.storage.revert();
       state.stack.push(new BN(0));
       state.lastReturned = [];
     } else {
       state.stack.push(new BN(1));
+      callState.storage.commit();
 
       const returnValue = sliceAndEnsureLength(callState.return || [], 0, retSize, 0);
       const newMemory = arrayCopy(state.memory, returnValue, retOffset);
@@ -122,8 +129,10 @@ export class CallCodeOpcode extends Opcode {
     if (hasErrored) {
       state.stack.push(new BN(0));
       state.lastReturned = [];
+      callState.storage.revert();
     } else {
       state.stack.push(new BN(1));
+      callState.storage.commit();
 
       const returnValue = sliceAndEnsureLength(callState.return || [], 0, retSize, 0);
       const newMemory = arrayCopy(state.memory, returnValue, retOffset);

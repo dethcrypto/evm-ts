@@ -13,7 +13,7 @@ export class SStoreOpcode extends Opcode {
     const location = state.stack.pop().toString(16);
     const value = state.stack.pop().toString(16);
 
-    state.storage[location] = value;
+    state.storage.set(location, value);
     state.pc += 1;
   }
 }
@@ -27,7 +27,7 @@ export class SLoadOpcode extends Opcode {
 
   run(state: IMachineState): void {
     const location = state.stack.pop().toString(16);
-    const value = state.storage[location];
+    const value = state.storage.getOrDefault(location, "");
 
     state.stack.push(new BN(value, 16));
     state.pc += 1;

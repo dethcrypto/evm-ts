@@ -7,6 +7,7 @@ import { byteStringToNumberArray } from "../../lib/utils/bytes";
 import { BN } from "bn.js";
 import { IEnvironment, IExternalTransaction, ITransactionResult, IStepContext, IMachineState } from "lib/types";
 import { Dictionary } from "ts-essentials";
+import { LayeredMap } from "lib/utils/LayeredMap";
 
 export async function compareWithReferentialImpl(code: string, env?: Partial<IEnvironment>): Promise<void> {
   const evmJs = new EVMJS();
@@ -17,7 +18,9 @@ export async function compareWithReferentialImpl(code: string, env?: Partial<IEn
 
   expect(evmTsResult.stack.toString()).to.be.eq(ethereumJsResult.runState.stack.toString());
   expect(evmTsResult.memory.toString()).to.be.eq(ethereumJsResult.runState.memory.toString());
-  expect(evmTsResult.storage).to.be.deep.eq(await evmJs.getFullContractStorage(ethereumJsResult.runState.address));
+  expect(evmTsResult.storage.dump()).to.be.deep.eq(
+    await evmJs.getFullContractStorage(ethereumJsResult.runState.address),
+  );
 }
 
 export async function compareInvalidCodeWithReferentialImpl(
@@ -162,7 +165,7 @@ export async function compareTransactionsWithReferentialImpl(script: (vm: IVm) =
 
   const jsBlockchainState = await evmJs.getFullBlockchainDump();
   const tsBlockchainState: Dictionary<IEqualAccount> = mapValues(evmTsBlockchain.accounts, acc => ({
-    storage: acc.storage,
+    storage: acc.storage.dump(),
   }));
   expect(tsBlockchainState).to.deep.eq(jsBlockchainState);
 }
@@ -177,14 +180,14 @@ export function runEvm(bytecode: string, env?: Partial<IEnvironment>): IMachineS
       address: commonAddressString,
       nonce: 0,
       value: new BN(0),
-      storage: {},
+      storage: new LayeredMap(),
       code: byteStringToNumberArray(bytecode),
     },
     caller: {
       address: commonAddressString,
       nonce: 0,
       value: new BN(0),
-      storage: {},
+      storage: new LayeredMap(),
       code: byteStringToNumberArray(bytecode),
     },
     code: byteStringToNumberArray(bytecode),

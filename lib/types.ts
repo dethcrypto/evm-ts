@@ -1,9 +1,9 @@
 import { BN } from "bn.js";
-import { Dictionary } from "ts-essentials";
 
 import { Opcode } from "./opcodes/common";
 import { Stack } from "./utils/Stack";
 import { VM } from "./VM";
+import { LayeredMap } from "./utils/LayeredMap";
 
 export interface IBlockchain {
   getAddress(address: string): IAccount;
@@ -20,13 +20,11 @@ export interface IVmEvents {
   step: IStepContext;
 }
 
-export type TStorage = Dictionary<string>;
-
 export interface IMachineState {
   pc: number;
   stack: Stack<BN>;
   memory: number[];
-  storage: TStorage;
+  storage: LayeredMap<string>;
   stopped: boolean;
   reverted: boolean;
   return?: ReadonlyArray<number>;
@@ -41,7 +39,7 @@ export interface IAccount {
   nonce: number;
   value: BN;
   code: ReadonlyArray<number>;
-  storage: TStorage;
+  storage: LayeredMap<string>;
 }
 
 export interface IExternalTransaction {

@@ -6,6 +6,7 @@ import * as ethUtil from "ethereumjs-util";
 import { VM } from "./VM";
 import { IAccount, ITransaction, ITransactionResult, IBlockchain } from "./types";
 import { isString } from "util";
+import { LayeredMap } from "./utils/LayeredMap";
 
 export class FakeBlockchain implements IBlockchain {
   public readonly vm = new VM(this);
@@ -43,7 +44,7 @@ export class FakeBlockchain implements IBlockchain {
       nonce: 0,
       value: new BN(0),
       code: [],
-      storage: {},
+      storage: new LayeredMap(),
     };
 
     this.accounts[account.address] = account;
