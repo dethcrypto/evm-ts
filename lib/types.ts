@@ -3,7 +3,6 @@ import { BN } from "bn.js";
 import { Opcode } from "./opcodes/common";
 import { Stack } from "./utils/Stack";
 import { VM } from "./VM";
-import { ReadonlyDictionary } from "ts-essentials";
 
 export type IBlockchain = {
   getAddress(address: string): IAccount;
@@ -75,3 +74,5 @@ export type IEnvironment = {
   value: BN;
   depth: number;
 };
+
+export declare type ReadonlyDictionary<T, K extends string | number = string> = { readonly [key in K]: T };
