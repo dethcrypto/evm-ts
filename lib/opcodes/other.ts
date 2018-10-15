@@ -2,6 +2,7 @@ import { keccak256 } from "ethereumjs-util";
 import { Opcode, notImplementedError } from "./common";
 import { BN } from "bn.js";
 import { IMachineState } from "../types";
+import { sliceAndEnsureLength, arrayCopy } from "../utils/arrays";
 
 export class StopOpcode extends Opcode {
   static id = 0x00;
@@ -45,6 +46,21 @@ export class ReturnDataSizeOpcode extends Opcode {
     const lastReturnSize = state.lastReturned.length;
 
     state.stack.push(new BN(lastReturnSize));
+    state.pc += 1;
+  }
+}
+
+export class ReturnDataCopyOpcode extends Opcode {
+  static id = 0x3e;
+  static type = "RETURNDATACOPY";
+
+  run(state: IMachineState): void {
+    const memOffset = state.stack.pop().toNumber();
+    const offset = state.stack.pop().toNumber();
+    const length = state.stack.pop().toNumber();
+
+    const result = sliceAndEnsureLength(state.lastReturned, offset, length, 0); // @todo it should throw when reaching out of array
+    state.memory = arrayCopy(state.memory, result, memOffset);
     state.pc += 1;
   }
 }

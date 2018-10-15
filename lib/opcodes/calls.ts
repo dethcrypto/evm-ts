@@ -9,6 +9,8 @@ export class CallOpcode extends Opcode {
   static type = "CALL";
 
   run(state: IMachineState, env: IEnvironment, vm: VM): void {
+    vm.blockchain.checkpoint();
+
     //tslint:disable-next-line
     const _gas = state.stack.pop();
     const addr = state.stack.pop();
@@ -22,10 +24,7 @@ export class CallOpcode extends Opcode {
     const data = state.memory.slice(inOffset, inOffset + inSize);
 
     const { state: callState } = vm.runCode({
-      account: {
-        ...account,
-        storage: account.storage.checkpoint(),
-      },
+      account: account.address,
       caller: env.account,
       code: account.code,
       value,
@@ -35,13 +34,14 @@ export class CallOpcode extends Opcode {
 
     const hasErrored = callState.reverted || !callState.stopped;
     if (hasErrored) {
-      callState.storage.revert();
+      vm.blockchain.revert();
+
       state.stack.push(new BN(0));
       state.lastReturned = [];
     } else {
+      vm.blockchain.commit();
       state.stack.push(new BN(1));
 
-      callState.storage.commit();
       const returnValue = sliceAndEnsureLength(callState.return || [], 0, retSize, 0);
       const newMemory = arrayCopy(state.memory, returnValue, retOffset);
 
@@ -58,6 +58,8 @@ export class DelegateCallOpcode extends Opcode {
   static type = "DELEGATECALL";
 
   run(state: IMachineState, env: IEnvironment, vm: VM): void {
+    vm.blockchain.checkpoint();
+
     //tslint:disable-next-line
     const _gas = state.stack.pop();
     const addr = state.stack.pop();
@@ -80,19 +82,20 @@ export class DelegateCallOpcode extends Opcode {
 
     const hasErrored = callState.reverted || !callState.stopped;
     if (hasErrored) {
-      callState.storage.revert();
+      vm.blockchain.revert();
+
       state.stack.push(new BN(0));
       state.lastReturned = [];
     } else {
+      vm.blockchain.commit();
+
       state.stack.push(new BN(1));
-      callState.storage.commit();
 
       const returnValue = sliceAndEnsureLength(callState.return || [], 0, retSize, 0);
       const newMemory = arrayCopy(state.memory, returnValue, retOffset);
 
       state.lastReturned = callState.return || [];
       state.memory = newMemory;
-      state.storage = callState.storage;
     }
 
     state.pc += 1;
@@ -104,6 +107,8 @@ export class CallCodeOpcode extends Opcode {
   static type = "CALLCODE";
 
   run(state: IMachineState, env: IEnvironment, vm: VM): void {
+    vm.blockchain.checkpoint();
+
     //tslint:disable-next-line
     const _gas = state.stack.pop();
     const addr = state.stack.pop();
@@ -127,19 +132,20 @@ export class CallCodeOpcode extends Opcode {
 
     const hasErrored = callState.reverted || !callState.stopped;
     if (hasErrored) {
+      vm.blockchain.revert();
+
       state.stack.push(new BN(0));
       state.lastReturned = [];
-      callState.storage.revert();
     } else {
+      vm.blockchain.commit();
+
       state.stack.push(new BN(1));
-      callState.storage.commit();
 
       const returnValue = sliceAndEnsureLength(callState.return || [], 0, retSize, 0);
       const newMemory = arrayCopy(state.memory, returnValue, retOffset);
 
       state.lastReturned = callState.return || [];
       state.memory = newMemory;
-      state.storage = callState.storage;
     }
 
     state.pc += 1;

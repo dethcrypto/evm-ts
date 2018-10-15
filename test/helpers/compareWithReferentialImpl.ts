@@ -1,5 +1,5 @@
 import { expect } from "chai";
-import { zip, mapValues } from "lodash";
+import { zip, mapValues, values } from "lodash";
 
 import { EVMJS, commonAddressString } from "./EVMJS";
 import { FakeBlockchain } from "../../lib/FakeBlockchain";
@@ -7,18 +7,19 @@ import { byteStringToNumberArray } from "../../lib/utils/bytes";
 import { BN } from "bn.js";
 import { IEnvironment, IExternalTransaction, ITransactionResult, IStepContext, IMachineState } from "lib/types";
 import { Dictionary } from "ts-essentials";
-import { LayeredMap } from "lib/utils/LayeredMap";
 
 export async function compareWithReferentialImpl(code: string, env?: Partial<IEnvironment>): Promise<void> {
   const evmJs = new EVMJS();
   await evmJs.setup();
 
   const ethereumJsResult = await evmJs.runCode(code, env);
-  const evmTsResult = runEvm(code, env);
+  const { state: evmTsResult, blockchain } = runEvm(code, env);
 
   expect(evmTsResult.stack.toString()).to.be.eq(ethereumJsResult.runState.stack.toString());
   expect(evmTsResult.memory.toString()).to.be.eq(ethereumJsResult.runState.memory.toString());
-  expect(evmTsResult.storage.dump()).to.be.deep.eq(
+  // @todo ehhh, we need to have an easy way to find address of the code execution context
+  const firstAccount = values(blockchain.dumpLayers())[0];
+  expect((firstAccount && firstAccount.storage) || {}).to.be.deep.eq(
     await evmJs.getFullContractStorage(ethereumJsResult.runState.address),
   );
 }
@@ -108,7 +109,7 @@ export async function compareTransactionsWithReferentialImpl(script: (vm: IVm) =
       stack: ctx.previousState.stack.toString(),
       memory: ctx.previousState.memory.toString(),
       pc: ctx.previousState.pc,
-      address: ctx.previousEnv.account.address,
+      address: ctx.previousEnv.account,
       code: ctx.previousEnv.code.toString(),
       data: ctx.previousEnv.data.toString(),
     });
@@ -164,38 +165,29 @@ export async function compareTransactionsWithReferentialImpl(script: (vm: IVm) =
   }
 
   const jsBlockchainState = await evmJs.getFullBlockchainDump();
-  const tsBlockchainState: Dictionary<IEqualAccount> = mapValues(evmTsBlockchain.accounts, acc => ({
-    storage: acc.storage.dump(),
+  const tsBlockchainState: Dictionary<IEqualAccount> = mapValues(evmTsBlockchain.dumpLayers(), acc => ({
+    storage: acc.storage,
   }));
   expect(tsBlockchainState).to.deep.eq(jsBlockchainState);
 }
 
-export function runEvm(bytecode: string, env?: Partial<IEnvironment>): IMachineState {
+export function runEvm(
+  bytecode: string,
+  env?: Partial<IEnvironment>,
+): { state: IMachineState; blockchain: FakeBlockchain } {
   const fakeBlockchain = new FakeBlockchain();
 
   const result = fakeBlockchain.vm.runCode({
     data: [],
     value: new BN(0),
-    account: {
-      address: commonAddressString,
-      nonce: 0,
-      value: new BN(0),
-      storage: new LayeredMap(),
-      code: byteStringToNumberArray(bytecode),
-    },
-    caller: {
-      address: commonAddressString,
-      nonce: 0,
-      value: new BN(0),
-      storage: new LayeredMap(),
-      code: byteStringToNumberArray(bytecode),
-    },
+    account: commonAddressString,
+    caller: commonAddressString,
     code: byteStringToNumberArray(bytecode),
     depth: 0,
     ...env,
   });
 
-  return result.state;
+  return { state: result.state, blockchain: fakeBlockchain };
 }
 
 function setupDebuggingLogs(evmJs: EVMJS, evmTsBlockchain: FakeBlockchain): void {

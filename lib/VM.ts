@@ -4,9 +4,7 @@ import { Stack } from "./utils/Stack";
 import { decodeOpcode } from "./decodeBytecode";
 import { PeekableIterator } from "./utils/PeekableIterator";
 import { EventEmitter } from "events";
-import { merge } from "lodash";
 import { IEnvironment, IMachineState, IVmEvents, IBlockchain } from "./types";
-import { LayeredMap } from "./utils/LayeredMap";
 
 const initialState: IMachineState = {
   pc: 0,
@@ -14,7 +12,6 @@ const initialState: IMachineState = {
   reverted: false,
   stack: new Stack(),
   memory: [],
-  storage: new LayeredMap(),
   lastReturned: [],
 };
 
@@ -26,11 +23,10 @@ export class VM extends VmEventsEmitter {
   }
 
   runCode(environment: IEnvironment): { state: IMachineState } {
-    const account = environment.account;
     const code = environment.code;
 
     const codeIterator = new PeekableIterator(code);
-    let state = merge({}, deepCloneState(initialState), { storage: account.storage });
+    let state = deepCloneState(initialState);
 
     while (!state.stopped) {
       // opcodes mutate states so we deep clone it first
@@ -61,9 +57,6 @@ export class VM extends VmEventsEmitter {
       state = newState;
     }
 
-    // finally update storage
-    account.storage = state.storage;
-
     return {
       state,
     };
@@ -77,7 +70,6 @@ function deepCloneState(state: IMachineState): IMachineState {
     reverted: state.reverted,
     stack: new Stack(state.stack),
     memory: [...state.memory],
-    storage: state.storage.clone(),
     lastReturned: [...state.lastReturned],
   };
 }

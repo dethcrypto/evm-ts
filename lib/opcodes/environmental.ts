@@ -81,7 +81,7 @@ export class CallerOpcode extends Opcode {
   static type = "CALLER";
 
   run(state: IMachineState, env: IEnvironment): void {
-    const address = new BN(env.caller.address, 16);
+    const address = new BN(env.caller, 16);
 
     state.stack.push(address);
     state.pc += 1;
@@ -93,7 +93,7 @@ export class AddressOpcode extends Opcode {
   static type = "ADDRESS";
 
   run(state: IMachineState, env: IEnvironment): void {
-    const address = new BN(env.account.address, 16);
+    const address = new BN(env.account, 16);
 
     state.stack.push(address);
     state.pc += 1;

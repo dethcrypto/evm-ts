@@ -3,10 +3,17 @@ import { BN } from "bn.js";
 import { Opcode } from "./opcodes/common";
 import { Stack } from "./utils/Stack";
 import { VM } from "./VM";
-import { LayeredMap } from "./utils/LayeredMap";
+import { ReadonlyDictionary } from "ts-essentials";
 
-export interface IBlockchain {
+export type IBlockchain = {
   getAddress(address: string): IAccount;
+  setAddress(address: string, account: IAccount): void;
+} & ILayered;
+
+export interface ILayered {
+  checkpoint(): void;
+  revert(): void;
+  commit(): void;
 }
 
 export interface IStepContext {
@@ -24,7 +31,6 @@ export interface IMachineState {
   pc: number;
   stack: Stack<BN>;
   memory: number[];
-  storage: LayeredMap<string>;
   stopped: boolean;
   reverted: boolean;
   return?: ReadonlyArray<number>;
@@ -33,13 +39,12 @@ export interface IMachineState {
 
 // @todo
 // this should be union type ContractAccount | PersonalAccount
-// and should be immutable
 export interface IAccount {
-  address: string;
-  nonce: number;
-  value: BN;
-  code: ReadonlyArray<number>;
-  storage: LayeredMap<string>;
+  readonly address: string;
+  readonly nonce: number;
+  readonly value: BN;
+  readonly code: ReadonlyArray<number>;
+  readonly storage: ReadonlyDictionary<string>;
 }
 
 export interface IExternalTransaction {
@@ -63,8 +68,8 @@ export interface ITransactionResult {
 }
 
 export type IEnvironment = {
-  account: IAccount;
-  caller: IAccount;
+  account: string; // @todo: we need a separate (opaque) type for addresses
+  caller: string;
   code: ReadonlyArray<number>;
   data: ReadonlyArray<number>;
   value: BN;
