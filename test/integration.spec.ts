@@ -49,4 +49,44 @@ describe("integration", () => {
       await vm.runTx({ to: callerAddress, data: caller.instance.performCallAndSaveReturn.getData().slice(2) });
     });
   });
+
+  it("should work with 'various-calls' contracts", () => {
+    const Caller = loadContract("various-calls/Caller");
+    const Code = loadContract("various-calls/Code");
+
+    return compareTransactionsWithReferentialImpl(async vm => {
+      const codeAddress = (await vm.runTx({ data: Code.bin })).accountCreated!;
+
+      const callerConstructorData = Caller.contract.new.getData(codeAddress, { data: Caller.bin });
+      const callerAddress = (await vm.runTx({
+        data: callerConstructorData,
+      })).accountCreated!;
+
+      await vm.runTx({ to: callerAddress, data: Caller.instance.callSetN.getData(1, false).slice(2) });
+      await vm.runTx({ to: callerAddress, data: Caller.instance.delegatecallSetN.getData(2, false).slice(2) });
+      await vm.runTx({ to: callerAddress, data: Caller.instance.callcodeSetN.getData(3, false).slice(2) });
+      await vm.runTx({ to: callerAddress, data: Caller.instance.solCallSetN.getData(4, false).slice(2) });
+      await vm.runTx({ to: callerAddress, data: Caller.instance.trampoline.getData(5, false).slice(2) });
+    });
+  });
+
+  it("should work with 'various-calls' contracts when rejecting", () => {
+    const Caller = loadContract("various-calls/Caller");
+    const Code = loadContract("various-calls/Code");
+
+    return compareTransactionsWithReferentialImpl(async vm => {
+      const codeAddress = (await vm.runTx({ data: Code.bin })).accountCreated!;
+
+      const callerConstructorData = Caller.contract.new.getData(codeAddress, { data: Caller.bin });
+      const callerAddress = (await vm.runTx({
+        data: callerConstructorData,
+      })).accountCreated!;
+
+      await vm.runTx({ to: callerAddress, data: Caller.instance.callSetN.getData(1, true).slice(2) });
+      await vm.runTx({ to: callerAddress, data: Caller.instance.delegatecallSetN.getData(2, true).slice(2) });
+      await vm.runTx({ to: callerAddress, data: Caller.instance.callcodeSetN.getData(3, true).slice(2) });
+      await vm.runTx({ to: callerAddress, data: Caller.instance.solCallSetN.getData(4, true).slice(2) });
+      await vm.runTx({ to: callerAddress, data: Caller.instance.trampoline.getData(5, true).slice(2) });
+    });
+  });
 });

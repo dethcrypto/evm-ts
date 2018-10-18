@@ -4,15 +4,14 @@ import { Stack } from "./utils/Stack";
 import { decodeOpcode } from "./decodeBytecode";
 import { PeekableIterator } from "./utils/PeekableIterator";
 import { EventEmitter } from "events";
-import { merge } from "lodash";
 import { IEnvironment, IMachineState, IVmEvents, IBlockchain } from "./types";
 
 const initialState: IMachineState = {
   pc: 0,
+  stopped: false,
+  reverted: false,
   stack: new Stack(),
   memory: [],
-  storage: {},
-  stopped: false,
   lastReturned: [],
 };
 
@@ -24,15 +23,16 @@ export class VM extends VmEventsEmitter {
   }
 
   runCode(environment: IEnvironment): { state: IMachineState } {
-    const account = environment.account;
-    const codeIterator = new PeekableIterator(account.code);
-    let state = merge({}, deepCloneState(initialState), { storage: account.storage });
+    const code = environment.code;
+
+    const codeIterator = new PeekableIterator(code);
+    let state = deepCloneState(initialState);
 
     while (!state.stopped) {
       // opcodes mutate states so we deep clone it first
       const newState = deepCloneState(state);
 
-      const isFinished = state.pc >= account.code.length;
+      const isFinished = state.pc >= code.length;
       if (isFinished) {
         newState.stopped = true;
         state = newState;
@@ -48,16 +48,14 @@ export class VM extends VmEventsEmitter {
         opcode.run(newState, environment, this);
       } catch (e) {
         // just for debugging purposes
-        if (environment.depth !== 0) {
+        // @todo we can do better by wrapping any errors in listeners and pushing them forward
+        if (environment.depth !== 0 || e.showDiff) {
           throw e;
         }
         throw new Error(`Error while running ${opcode.type} at position ${state.pc}: ${e.message}`);
       }
       state = newState;
     }
-
-    // finally update storage
-    account.storage = state.storage;
 
     return {
       state,
@@ -69,9 +67,9 @@ function deepCloneState(state: IMachineState): IMachineState {
   return {
     pc: state.pc,
     stopped: state.stopped,
+    reverted: state.reverted,
     stack: new Stack(state.stack),
     memory: [...state.memory],
-    storage: { ...state.storage },
     lastReturned: [...state.lastReturned],
   };
 }

@@ -1,23 +1,27 @@
 import { expect } from "chai";
-import * as rlp from "rlp";
-import { zip, Dictionary } from "lodash";
+import { zip, mapValues, values } from "lodash";
 
 import { EVMJS, commonAddressString } from "./EVMJS";
 import { FakeBlockchain } from "../../lib/FakeBlockchain";
 import { byteStringToNumberArray } from "../../lib/utils/bytes";
 import { BN } from "bn.js";
 import { IEnvironment, IExternalTransaction, ITransactionResult, IStepContext, IMachineState } from "lib/types";
+import { Dictionary } from "ts-essentials";
 
 export async function compareWithReferentialImpl(code: string, env?: Partial<IEnvironment>): Promise<void> {
   const evmJs = new EVMJS();
   await evmJs.setup();
 
   const ethereumJsResult = await evmJs.runCode(code, env);
-  const evmTsResult = runEvm(code, env);
+  const { state: evmTsResult, blockchain } = runEvm(code, env);
 
   expect(evmTsResult.stack.toString()).to.be.eq(ethereumJsResult.runState.stack.toString());
   expect(evmTsResult.memory.toString()).to.be.eq(ethereumJsResult.runState.memory.toString());
-  expect(evmTsResult.storage).to.be.deep.eq(await getFullContractStorage(ethereumJsResult));
+  // @todo ehhh, we need to have an easy way to find address of the code execution context
+  const firstAccount = values(blockchain.dumpLayers())[0];
+  expect((firstAccount && firstAccount.storage) || {}).to.be.deep.eq(
+    await evmJs.getFullContractStorage(ethereumJsResult.runState.address),
+  );
 }
 
 export async function compareInvalidCodeWithReferentialImpl(
@@ -36,12 +40,18 @@ export async function compareInvalidCodeWithReferentialImpl(
   expect(() => runEvm(code, { value: env && env.value, data: env && env.data })).to.throw(tsError);
 }
 
-interface IEqualState {
+export interface IEqualAccount {
+  storage: Dictionary<string>;
+}
+
+export interface IEqualState {
   opcode: string;
   stack: string;
   memory: string;
   pc: number;
   address: string;
+  code: string;
+  data: string;
 }
 
 interface IVm {
@@ -82,11 +92,12 @@ export async function compareTransactionsWithReferentialImpl(script: (vm: IVm) =
   const evmJsStepListener = (data: any) => {
     getLastElement(evmJsStates).push({
       opcode: data.opcode.name,
-      // address: data.address.toString("hex"),
       stack: data.stack.toString(),
       memory: data.memory.toString(),
       pc: data.pc,
       address: data.address.toString("hex"),
+      code: [...data.code].toString(),
+      data: data.data.length === 1 ? "" : [...data.data].toString(), // otherwise empty buffer gets serialized to string incorrectly
     });
   };
   evmJs.vm.on("step", evmJsStepListener);
@@ -98,8 +109,9 @@ export async function compareTransactionsWithReferentialImpl(script: (vm: IVm) =
       stack: ctx.previousState.stack.toString(),
       memory: ctx.previousState.memory.toString(),
       pc: ctx.previousState.pc,
-      // code: ctx.vm.blockchain.getAddress(ctx.previousEnv.account.address).code, // @todo we cannot use account.code b/c it's not set correctly during contract deployment
-      address: ctx.previousEnv.account.address,
+      address: ctx.previousEnv.account,
+      code: ctx.previousEnv.code.toString(),
+      data: ctx.previousEnv.data.toString(),
     });
 
     //we can already compare states here:
@@ -151,26 +163,31 @@ export async function compareTransactionsWithReferentialImpl(script: (vm: IVm) =
   for (let [evmJsResult, evmTsResult] of zip(evmJsStates, evmTsStates)) {
     expect(evmTsResult).to.deep.eq(evmJsResult, `Internal state doesnt match at tx no: ${stepCounter++}`);
   }
+
+  const jsBlockchainState = await evmJs.getFullBlockchainDump();
+  const tsBlockchainState: Dictionary<IEqualAccount> = mapValues(evmTsBlockchain.dumpLayers(), acc => ({
+    storage: acc.storage,
+  }));
+  expect(tsBlockchainState).to.deep.eq(jsBlockchainState);
 }
 
-export function runEvm(bytecode: string, env?: Partial<IEnvironment>): IMachineState {
+export function runEvm(
+  bytecode: string,
+  env?: Partial<IEnvironment>,
+): { state: IMachineState; blockchain: FakeBlockchain } {
   const fakeBlockchain = new FakeBlockchain();
 
   const result = fakeBlockchain.vm.runCode({
     data: [],
     value: new BN(0),
-    account: {
-      address: commonAddressString,
-      nonce: 0,
-      value: new BN(0),
-      storage: {},
-      code: byteStringToNumberArray(bytecode),
-    },
+    account: commonAddressString,
+    caller: commonAddressString,
+    code: byteStringToNumberArray(bytecode),
     depth: 0,
     ...env,
   });
 
-  return result.state;
+  return { state: result.state, blockchain: fakeBlockchain };
 }
 
 function setupDebuggingLogs(evmJs: EVMJS, evmTsBlockchain: FakeBlockchain): void {
@@ -182,31 +199,5 @@ function setupDebuggingLogs(evmJs: EVMJS, evmTsBlockchain: FakeBlockchain): void
   evmJs.vm.on("step", (data: any) => {
     // tslint:disable-next-line
     console.log(`JS: ${data.pc} => ${data.opcode.name}`);
-  });
-}
-
-function getFullContractStorage(ethereumJsResult: any): Promise<Dictionary<string>> {
-  return new Promise((resolve, reject) => {
-    ethereumJsResult.runState.stateManager._getStorageTrie(ethereumJsResult.runState.address, (err: any, res: any) => {
-      if (err) {
-        reject(err);
-        return;
-      }
-
-      const storage: Dictionary<string> = {};
-
-      const readStream = res.createReadStream();
-
-      readStream.on("data", (data: any) => {
-        const key: string = parseInt(data.key.toString("hex")).toString(); // @todo this is quite ugly and obviously won't work in any case. To fix when storage implementation in evm-ts gets better
-        const value: string = rlp.decode(data.value).toString("hex");
-
-        storage[key] = value;
-      });
-
-      readStream.on("end", () => {
-        resolve(storage);
-      });
-    });
   });
 }

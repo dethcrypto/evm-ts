@@ -1,4 +1,5 @@
 import * as VMJS from "ethereumjs-vm";
+import * as rlp from "rlp";
 import * as Transaction from "ethereumjs-tx";
 import * as Trie from "merkle-patricia-tree";
 import * as Account from "ethereumjs-account";
@@ -6,6 +7,8 @@ import * as utils from "ethereumjs-util";
 
 import invariant = require("invariant");
 import { IEnvironment, IExternalTransaction, ITransactionResult } from "lib/types";
+import { Dictionary } from "ts-essentials";
+import { IEqualAccount } from "./compareWithReferentialImpl";
 const keyPair = require("./keyPair");
 
 const publicKeyBuf = Buffer.from(keyPair.publicKey, "hex");
@@ -16,9 +19,11 @@ export class EVMJS {
   private nonce = 0;
   public readonly vm: any;
   private stateTrie = new Trie();
+  private stateManager: any;
 
   constructor() {
     this.vm = new VMJS({ state: this.stateTrie });
+    this.stateManager = this.vm.stateManager;
   }
 
   public async setup(): Promise<void> {
@@ -78,7 +83,7 @@ export class EVMJS {
       caller: commonAddress,
       nonce,
       gasPrice: "0x09184e72a000",
-      gasLimit: "0x90710",
+      gasLimit: "0x900710",
     });
 
     tx.sign(Buffer.from(keyPair.secretKey, "hex"));
@@ -107,5 +112,46 @@ export class EVMJS {
         reject(e);
       }
     });
+  }
+
+  getFullContractStorage(address: Buffer): Promise<Dictionary<string>> {
+    return new Promise((resolve, reject) => {
+      this.stateManager._getStorageTrie(address, (err: any, res: any) => {
+        if (err) {
+          reject(err);
+          return;
+        }
+
+        const storage: Dictionary<string> = {};
+
+        const readStream = res.createReadStream();
+
+        readStream.on("data", (data: any) => {
+          const key: string = parseInt(data.key.toString("hex")).toString(); // @todo this is quite ugly and obviously won't work in any case. To fix when storage implementation in evm-ts gets better
+          const value: string = rlp.decode(data.value).toString("hex");
+
+          // HACK: some differences between RLP decoded version and our current internal representation. Could be fragile :/
+          const parsedValue = value.startsWith("0") ? value.slice(1) : value;
+
+          storage[key] = parsedValue;
+        });
+
+        readStream.on("end", () => {
+          resolve(storage);
+        });
+      });
+    });
+  }
+
+  async getFullBlockchainDump(): Promise<Dictionary<IEqualAccount>> {
+    const allAccounts = this.stateManager.allAccounts as Set<Buffer>;
+
+    const dump: Dictionary<IEqualAccount> = {};
+    for (const account of allAccounts) {
+      dump[account.toString("hex")] = {
+        storage: await this.getFullContractStorage(account),
+      };
+    }
+    return dump;
   }
 }

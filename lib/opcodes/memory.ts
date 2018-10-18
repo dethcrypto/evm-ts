@@ -54,7 +54,7 @@ export class CodeCopyOpcode extends Opcode {
     const codeOffset = state.stack.pop().toNumber();
     const length = state.stack.pop().toNumber();
 
-    const codeToCopy = env.account.code.slice(codeOffset, codeOffset + length);
+    const codeToCopy = env.code.slice(codeOffset, codeOffset + length);
 
     const newMemory = arrayCopy(state.memory, codeToCopy, memOffset);
 

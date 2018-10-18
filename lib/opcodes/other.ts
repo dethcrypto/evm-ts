@@ -1,6 +1,8 @@
+import { keccak256 } from "ethereumjs-util";
 import { Opcode, notImplementedError } from "./common";
 import { BN } from "bn.js";
 import { IMachineState } from "../types";
+import { sliceAndEnsureLength, arrayCopy } from "../utils/arrays";
 
 export class StopOpcode extends Opcode {
   static id = 0x00;
@@ -17,7 +19,7 @@ export class RevertOpcode extends Opcode {
 
   run(state: IMachineState): void {
     state.stopped = true;
-    // @todo: proper impl
+    state.reverted = true;
   }
 }
 
@@ -48,6 +50,21 @@ export class ReturnDataSizeOpcode extends Opcode {
   }
 }
 
+export class ReturnDataCopyOpcode extends Opcode {
+  static id = 0x3e;
+  static type = "RETURNDATACOPY";
+
+  run(state: IMachineState): void {
+    const memOffset = state.stack.pop().toNumber();
+    const offset = state.stack.pop().toNumber();
+    const length = state.stack.pop().toNumber();
+
+    const result = sliceAndEnsureLength(state.lastReturned, offset, length, 0); // @todo it should throw when reaching out of array
+    state.memory = arrayCopy(state.memory, result, memOffset);
+    state.pc += 1;
+  }
+}
+
 export class BlockHashOpcode extends Opcode {
   static id = 0x40;
   static type = "BLOCKHASH";
@@ -61,7 +78,15 @@ export class Sha3Opcode extends Opcode {
   static id = 0x20;
   static type = "SHA3";
 
-  run(_state: IMachineState): void {
-    notImplementedError();
+  run(state: IMachineState): void {
+    const memoryOffset = state.stack.pop().toNumber();
+    const memorySize = state.stack.pop().toNumber();
+
+    const data = state.memory.slice(memoryOffset, memoryOffset + memorySize);
+
+    const result = keccak256(data);
+
+    state.stack.push(new BN(result));
+    state.pc += 1;
   }
 }

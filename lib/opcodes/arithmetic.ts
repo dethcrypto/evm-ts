@@ -2,7 +2,7 @@ import { BN } from "bn.js";
 
 import { Opcode } from "./common";
 import { MAX_UINT_256 } from "../utils/bytes";
-import { IMachineState } from "lib/types";
+import { IMachineState } from "../types";
 
 export class AddOpcode extends Opcode {
   static id = 0x01;

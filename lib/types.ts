@@ -1,12 +1,18 @@
 import { BN } from "bn.js";
-import { Dictionary } from "ts-essentials";
 
 import { Opcode } from "./opcodes/common";
 import { Stack } from "./utils/Stack";
 import { VM } from "./VM";
 
-export interface IBlockchain {
+export type IBlockchain = {
   getAddress(address: string): IAccount;
+  setAddress(address: string, account: IAccount): void;
+} & ILayered;
+
+export interface ILayered {
+  checkpoint(): void;
+  revert(): void;
+  commit(): void;
 }
 
 export interface IStepContext {
@@ -20,27 +26,24 @@ export interface IVmEvents {
   step: IStepContext;
 }
 
-export type TStorage = Dictionary<string>;
-
 export interface IMachineState {
   pc: number;
   stack: Stack<BN>;
   memory: number[];
-  storage: TStorage;
   stopped: boolean;
+  reverted: boolean;
   return?: ReadonlyArray<number>;
   lastReturned: ReadonlyArray<number>; // EIP-211
 }
 
 // @todo
 // this should be union type ContractAccount | PersonalAccount
-// and should be immutable
 export interface IAccount {
-  address: string;
-  nonce: number;
-  value: BN;
-  code: ReadonlyArray<number>;
-  storage: TStorage;
+  readonly address: string;
+  readonly nonce: number;
+  readonly value: BN;
+  readonly code: ReadonlyArray<number>;
+  readonly storage: ReadonlyDictionary<string>;
 }
 
 export interface IExternalTransaction {
@@ -64,9 +67,12 @@ export interface ITransactionResult {
 }
 
 export type IEnvironment = {
-  account: IAccount;
+  account: string; // @todo: we need a separate (opaque) type for addresses
+  caller: string;
+  code: ReadonlyArray<number>;
   data: ReadonlyArray<number>;
   value: BN;
   depth: number;
-  // @todo we miss code here b/c we cannot use account.code during deployment andd tis really just a context account
 };
+
+export declare type ReadonlyDictionary<T, K extends string | number = string> = { readonly [key in K]: T };
