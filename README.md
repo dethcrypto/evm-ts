@@ -10,6 +10,13 @@
   </p>
 </p>
 
+## Project status
+
+- runs simple contracts, checkout [solidity tests](https://github.com/ethereum-ts/evm-ts/tree/master/test/contracts) 🔥
+- supports ~110 opcodes 😍
+- tests running agains _ethereumjs-vm_ (soon agains _geth_ or _parity_) 🐞
+- lacks gas calculation 😓
+
 ## EVM short description
 
 - stack based
