@@ -1,7 +1,7 @@
 {
   "name": "evm-ts",
   "version": "0.0.1",
-  "main": "index.js",
+  "main": "dist/FakeBlockchain.js",
   "license": "MIT",
   "scripts": {
     "prepare": "patch-package",
@@ -20,7 +20,9 @@
     "pretest:mocha": "yarn compile-solidity",
     "test:mocha:coverage": "NODE_ENV=test nyc mocha -r ts-node/register -r tsconfig-paths/register '**/*.spec.ts'",
     "pretest:mocha:coverage": "yarn compile-solidity",
-    "coveralls": "nyc report --reporter=text-lcov | coveralls"
+    "coveralls": "nyc report --reporter=text-lcov | coveralls",
+    "prebuild": "yarn test",
+    "build": "rm -rf ./dist && tsc -p ./tsconfig.prod.json"
   },
   "dependencies": {
     "bn.js": "^4.11.8",
