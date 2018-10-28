@@ -1,6 +1,6 @@
 import { VM } from "../VM";
 import { Opcode } from "./common";
-import { IMachineState, IEnvironment } from "../types";
+import { MachineState, Environment } from "../types";
 import { arrayCopy, sliceAndEnsureLength } from "../utils/arrays";
 import { BN } from "bn.js";
 
@@ -8,7 +8,7 @@ export class CallOpcode extends Opcode {
   static id = 0xf1;
   static type = "CALL";
 
-  run(state: IMachineState, env: IEnvironment, vm: VM): void {
+  run(state: MachineState, env: Environment, vm: VM): void {
     vm.blockchain.checkpoint();
 
     //tslint:disable-next-line
@@ -57,7 +57,7 @@ export class DelegateCallOpcode extends Opcode {
   static id = 0xf4;
   static type = "DELEGATECALL";
 
-  run(state: IMachineState, env: IEnvironment, vm: VM): void {
+  run(state: MachineState, env: Environment, vm: VM): void {
     vm.blockchain.checkpoint();
 
     //tslint:disable-next-line
@@ -106,7 +106,7 @@ export class CallCodeOpcode extends Opcode {
   static id = 0xf2;
   static type = "CALLCODE";
 
-  run(state: IMachineState, env: IEnvironment, vm: VM): void {
+  run(state: MachineState, env: Environment, vm: VM): void {
     vm.blockchain.checkpoint();
 
     //tslint:disable-next-line

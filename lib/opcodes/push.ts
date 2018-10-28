@@ -2,7 +2,7 @@ import { BN } from "bn.js";
 
 import { Opcode, DecodeError } from "./common";
 import { PeekableIterator } from "../utils/PeekableIterator";
-import { IMachineState } from "../types";
+import { MachineState } from "../types";
 
 /**
  * PUSH is a family of opcodes.
@@ -33,7 +33,7 @@ export class PushOpcode extends Opcode {
     super(baseId + byteNumber, `${baseType}${byteNumber}`);
   }
 
-  run(state: IMachineState): void {
+  run(state: MachineState): void {
     state.stack.push(this.arg);
     state.pc += this.byteNumber + 1;
   }

@@ -7,6 +7,6 @@
     "allowJs": false,
     "declaration": true
   },
-  "include": ["./lib/**/*.ts", "./@types/**/*.ts"],
+  "include": ["./lib/**/*.ts"],
   "exclude": ["test/**/*.ts", "**/*.spec.ts"]
 }

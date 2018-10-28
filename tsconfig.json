@@ -10,5 +10,5 @@
       "test": ["test/*"]
     }
   },
-  "include": ["**/*.ts"]
+  "include": ["./lib/**/*.ts", "./test/**/*.ts"]
 }

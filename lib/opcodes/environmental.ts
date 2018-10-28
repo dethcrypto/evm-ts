@@ -2,7 +2,7 @@ import { BN } from "bn.js";
 
 import { Opcode } from "./common";
 import { sliceAndEnsureLength } from "../utils/arrays";
-import { IMachineState, IEnvironment } from "../types";
+import { MachineState, Environment } from "../types";
 import { VM } from "../VM";
 
 export class LoadCallData extends Opcode {
@@ -10,7 +10,7 @@ export class LoadCallData extends Opcode {
   static type = "CALLDATALOAD";
   static bytesToRead = 32;
 
-  run(state: IMachineState, env: IEnvironment): void {
+  run(state: MachineState, env: Environment): void {
     const readIndex = state.stack.pop().toNumber();
 
     const data = sliceAndEnsureLength(env.data, readIndex, LoadCallData.bytesToRead, 0);
@@ -25,7 +25,7 @@ export class CallValueOpcode extends Opcode {
   static id = 0x34;
   static type = "CALLVALUE";
 
-  run(state: IMachineState, env: IEnvironment): void {
+  run(state: MachineState, env: Environment): void {
     state.stack.push(env.value);
     state.pc += 1;
   }
@@ -35,7 +35,7 @@ export class CallDataSizeOpcode extends Opcode {
   static id = 0x36;
   static type = "CALLDATASIZE";
 
-  run(state: IMachineState, env: IEnvironment): void {
+  run(state: MachineState, env: Environment): void {
     const size = new BN(env.data.length);
 
     state.stack.push(size);
@@ -47,7 +47,7 @@ export class ExtCodeSizeOpcode extends Opcode {
   static id = 0x3b;
   static type = "EXTCODESIZE";
 
-  run(state: IMachineState, _env: IEnvironment, vm: VM): void {
+  run(state: MachineState, _env: Environment, vm: VM): void {
     const addr = state.stack.pop();
 
     const account = vm.blockchain.getAddress(addr.toString(16));
@@ -63,7 +63,7 @@ export class GasOpcode extends Opcode {
   static id = 0x5a;
   static type = "GAS";
 
-  run(state: IMachineState): void {
+  run(state: MachineState): void {
     // @todo hardcoded value since we dont do any gas calculation for now
     if (process.env.NODE_ENV === "test") {
       const gasValue = (global as any).getStackValueFromJsEVM();
@@ -80,7 +80,7 @@ export class CallerOpcode extends Opcode {
   static id = 0x33;
   static type = "CALLER";
 
-  run(state: IMachineState, env: IEnvironment): void {
+  run(state: MachineState, env: Environment): void {
     const address = new BN(env.caller, 16);
 
     state.stack.push(address);
@@ -92,7 +92,7 @@ export class AddressOpcode extends Opcode {
   static id = 0x30;
   static type = "ADDRESS";
 
-  run(state: IMachineState, env: IEnvironment): void {
+  run(state: MachineState, env: Environment): void {
     const address = new BN(env.account, 16);
 
     state.stack.push(address);

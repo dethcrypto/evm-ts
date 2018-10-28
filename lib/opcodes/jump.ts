@@ -1,11 +1,11 @@
 import { Opcode } from "./common";
-import { IMachineState, IEnvironment } from "../types";
+import { MachineState, Environment } from "../types";
 
 export class JumpOpcode extends Opcode {
   static id = 0x56;
   static type = "JUMP";
 
-  run(state: IMachineState, env: IEnvironment): void {
+  run(state: MachineState, env: Environment): void {
     const jumpDestinationRaw = state.stack.pop();
     const jumpDestination = jumpDestinationRaw.toNumber();
 
@@ -22,7 +22,7 @@ export class JumpIOpcode extends Opcode {
   static id = 0x57;
   static type = "JUMPI";
 
-  run(state: IMachineState): void {
+  run(state: MachineState): void {
     const jumpDestination = state.stack.pop();
     const jumpCondition = state.stack.pop();
 
@@ -41,7 +41,7 @@ export class JumpDestOpcode extends Opcode {
   static id = 0x5b;
   static type = "JUMPDEST";
 
-  run(state: IMachineState): void {
+  run(state: MachineState): void {
     state.pc += 1;
   }
 }

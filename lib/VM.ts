@@ -4,9 +4,9 @@ import { Stack } from "./utils/Stack";
 import { decodeOpcode } from "./decodeBytecode";
 import { PeekableIterator } from "./utils/PeekableIterator";
 import { EventEmitter } from "events";
-import { IEnvironment, IMachineState, IVmEvents, IBlockchain } from "./types";
+import { Environment, MachineState, VmEvents, Blockchain } from "./types";
 
-const initialState: IMachineState = {
+const initialState: MachineState = {
   pc: 0,
   stopped: false,
   reverted: false,
@@ -15,14 +15,14 @@ const initialState: IMachineState = {
   lastReturned: [],
 };
 
-const VmEventsEmitter: { new (): StrictEventEmitter<EventEmitter, IVmEvents> } = EventEmitter as any;
+const VmEventsEmitter: { new (): StrictEventEmitter<EventEmitter, VmEvents> } = EventEmitter as any;
 
 export class VM extends VmEventsEmitter {
-  constructor(public blockchain: IBlockchain) {
+  constructor(public blockchain: Blockchain) {
     super();
   }
 
-  runCode(environment: IEnvironment): { state: IMachineState } {
+  runCode(environment: Environment): { state: MachineState } {
     const code = environment.code;
 
     const codeIterator = new PeekableIterator(code);
@@ -63,7 +63,7 @@ export class VM extends VmEventsEmitter {
   }
 }
 
-function deepCloneState(state: IMachineState): IMachineState {
+function deepCloneState(state: MachineState): MachineState {
   return {
     pc: state.pc,
     stopped: state.stopped,

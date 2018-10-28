@@ -5,7 +5,7 @@
     "no-debugger": true,
     "typedef": [true, "call-signature"],
     "mocha-avoid-only": true,
-    "interface-name": [true, "always-prefix"],
+    "interface-name": [true, "never-prefix"],
     "no-commented-code": true,
     "no-use-before-declare": false
   }

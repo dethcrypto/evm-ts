@@ -1,7 +1,7 @@
 import { Opcode } from "./common";
 import { PeekableIterator } from "../utils/PeekableIterator";
 import { getIndexOrDie } from "../utils/arrays";
-import { IMachineState } from "../types";
+import { MachineState } from "../types";
 
 /**
  * SWAP is a family of opcodes.
@@ -27,7 +27,7 @@ export class SwapOpcode extends Opcode {
     super(baseId + byteNumber, `${baseType}${byteNumber}`);
   }
 
-  run(state: IMachineState): void {
+  run(state: MachineState): void {
     const indexToSwap = state.stack.length - this.byteNumber - 1;
     const peekIndex = state.stack.length - 1;
 
