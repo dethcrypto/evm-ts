@@ -2,7 +2,11 @@
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "baseUrl": null,
-    "paths": null
+    "paths": null,
+    "outDir": "./dist",
+    "allowJs": false,
+    "declaration": true
   },
+  "include": ["./lib/**/*.ts", "./@types/**/*.ts"],
   "exclude": ["test/**/*.ts", "**/*.spec.ts"]
 }
