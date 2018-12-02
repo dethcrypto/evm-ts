@@ -4,6 +4,24 @@ import { Opcode } from "./opcodes/common";
 import { Stack } from "./utils/Stack";
 import { VM } from "./VM";
 
+// based on ethereum yellowpaper
+type Block = {
+  parentHash: string;
+  unclesHash: string; // ommersHash
+  beneficiary: string;
+  stateRoot: string;
+  transactionsRoot: string;
+  receiptsRoot: string;
+  logsBloom: string;
+  difficulty: number;
+  ancestorBlocksNo: number; // number
+  gasLimit: number;
+  gasUser: number;
+  timestamp: number;
+  extraData: string;
+  mixHash: string;
+};
+
 export type Blockchain = {
   getAddress(address: string): Account;
   setAddress(address: string, account: Account): void;
