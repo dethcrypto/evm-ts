@@ -1,6 +1,5 @@
 {
   "compilerOptions": {
-    "noImplicitAny": true,
     "strict": true,
     "module": "commonjs",
     "target": "es2015",
@@ -8,7 +7,7 @@
     "baseUrl": ".",
     "paths": {
       "test": ["test/*"]
-    }
+    },
   },
-  "include": ["./lib/**/*.ts", "./test/**/*.ts"]
+  "include": ["./lib/**/*.ts", "./test/**/*.ts", "./node_modules/bn.js-typings/index.d.ts"]
 }
