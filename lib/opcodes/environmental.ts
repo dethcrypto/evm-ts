@@ -26,7 +26,7 @@ export class CallValueOpcode extends Opcode {
   static type = "CALLVALUE";
 
   run(state: MachineState, env: Environment): void {
-    state.stack.push(env.value);
+    state.stack.push(env.value || new BN(0));
     state.pc += 1;
   }
 }

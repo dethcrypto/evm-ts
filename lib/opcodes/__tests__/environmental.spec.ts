@@ -21,7 +21,7 @@ describe("environmental opcodes", () => {
   });
 
   describe("CALLVALUE", () => {
-    it("zero value", () => compareWithReferentialImpl("34"));
+    it("zero value", () => compareWithReferentialImpl("34")); // @TODO: this test is useless since value is set in wrapper = 0
     it("non zero value", () => compareWithReferentialImpl("34", { value: new BN(123) }));
   });
 });
