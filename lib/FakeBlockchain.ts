@@ -4,14 +4,14 @@ import { Dictionary } from "ts-essentials";
 import * as ethUtil from "ethereumjs-util";
 
 import { VM } from "./VM";
-import { IAccount, ITransaction, ITransactionResult, IBlockchain } from "./types";
+import { Account, Transaction, TransactionResult, Blockchain } from "./types";
 import { isString } from "util";
 import { getIndexOrDie } from "./utils/arrays";
 import { findLastIndex } from "lodash";
 
-export class FakeBlockchain implements IBlockchain {
+export class FakeBlockchain implements Blockchain {
   public readonly vm = new VM(this);
-  public layeredAccounts: Array<Dictionary<IAccount>> = [{}];
+  public layeredAccounts: Array<Dictionary<Account>> = [{}];
 
   // @todo i am feeling like we could extract layering to separate mixin / class
   public checkpoint(): void {
@@ -35,15 +35,15 @@ export class FakeBlockchain implements IBlockchain {
     };
   }
 
-  public dumpLayers(): Dictionary<IAccount> {
-    return this.layeredAccounts.reduce((acc, cur) => ({ ...acc, ...cur }), {} as Dictionary<IAccount>);
+  public dumpLayers(): Dictionary<Account> {
+    return this.layeredAccounts.reduce((acc, cur) => ({ ...acc, ...cur }), {} as Dictionary<Account>);
   }
 
-  private getTopLayer(): Dictionary<IAccount> {
+  private getTopLayer(): Dictionary<Account> {
     return getIndexOrDie(this.layeredAccounts, -1);
   }
 
-  public getAddress(_address: string): IAccount {
+  public getAddress(_address: string): Account {
     const address = _address.startsWith("0x") ? _address.slice(2) : _address;
     const foundAccountLayer = findLastIndex(this.layeredAccounts, acc => !!acc[address]);
 
@@ -54,15 +54,15 @@ export class FakeBlockchain implements IBlockchain {
   }
 
   // possible new API, `updateAddress`
-  public setAddress(_address: string, account: IAccount): void {
+  public setAddress(_address: string, account: Account): void {
     const address = _address.startsWith("0x") ? _address.slice(2) : _address;
 
     this.getTopLayer()[address] = account;
   }
 
-  private createNewAccount(fromAccount: IAccount): IAccount;
-  private createNewAccount(desiredAddress: string): IAccount;
-  private createNewAccount(fromAccountOrDesiredAccount: IAccount | string): IAccount {
+  private createNewAccount(fromAccount: Account): Account;
+  private createNewAccount(desiredAddress: string): Account;
+  private createNewAccount(fromAccountOrDesiredAccount: Account | string): Account {
     let address: string;
     if (isString(fromAccountOrDesiredAccount)) {
       address = fromAccountOrDesiredAccount;
@@ -78,7 +78,7 @@ export class FakeBlockchain implements IBlockchain {
       });
     }
 
-    const account: IAccount = {
+    const account: Account = {
       address,
       nonce: 0,
       value: new BN(0),
@@ -91,7 +91,7 @@ export class FakeBlockchain implements IBlockchain {
     return account;
   }
 
-  public runTx(tx: ITransaction): ITransactionResult {
+  public runTx(tx: Transaction): TransactionResult {
     invariant(tx.data || tx.to || tx.value || tx.from, "Tx is empty");
 
     this.checkpoint();

@@ -6,9 +6,9 @@ import * as Account from "ethereumjs-account";
 import * as utils from "ethereumjs-util";
 
 import invariant = require("invariant");
-import { IEnvironment, IExternalTransaction, ITransactionResult } from "lib/types";
+import { Environment, ExternalTransaction, TransactionResult } from "lib/types";
 import { Dictionary } from "ts-essentials";
-import { IEqualAccount } from "./compareWithReferentialImpl";
+import { EqualAccount } from "./compareWithReferentialImpl";
 const keyPair = require("./keyPair");
 
 const publicKeyBuf = Buffer.from(keyPair.publicKey, "hex");
@@ -35,7 +35,7 @@ export class EVMJS {
     });
   }
 
-  public async runCode(code: string, env: Partial<IEnvironment> = {}): Promise<any> {
+  public async runCode(code: string, env: Partial<Environment> = {}): Promise<any> {
     return new Promise<any>(async (resolve, reject) => {
       const data = env.data && Buffer.from(env.data as any);
 
@@ -62,7 +62,7 @@ export class EVMJS {
     });
   }
 
-  public async runTx(transaction: IExternalTransaction): Promise<ITransactionResult> {
+  public async runTx(transaction: ExternalTransaction): Promise<TransactionResult> {
     invariant(transaction.data, "Tx data is required");
 
     if (!transaction.data!.startsWith("0x")) {
@@ -143,10 +143,10 @@ export class EVMJS {
     });
   }
 
-  async getFullBlockchainDump(): Promise<Dictionary<IEqualAccount>> {
+  async getFullBlockchainDump(): Promise<Dictionary<EqualAccount>> {
     const allAccounts = this.stateManager.allAccounts as Set<Buffer>;
 
-    const dump: Dictionary<IEqualAccount> = {};
+    const dump: Dictionary<EqualAccount> = {};
     for (const account of allAccounts) {
       dump[account.toString("hex")] = {
         storage: await this.getFullContractStorage(account),

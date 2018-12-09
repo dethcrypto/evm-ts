@@ -2,13 +2,13 @@ import { BN } from "bn.js";
 
 import { Opcode } from "./common";
 import { MAX_UINT_256 } from "../utils/bytes";
-import { IMachineState } from "../types";
+import { MachineState } from "../types";
 
 export class AddOpcode extends Opcode {
   static id = 0x01;
   static type = "ADD";
 
-  run(state: IMachineState): void {
+  run(state: MachineState): void {
     const arg1 = state.stack.pop();
     const arg2 = state.stack.pop();
 
@@ -23,7 +23,7 @@ export class MulOpcode extends Opcode {
   static id = 0x02;
   static type = "MUL";
 
-  run(state: IMachineState): void {
+  run(state: MachineState): void {
     const arg1 = state.stack.pop();
     const arg2 = state.stack.pop();
 
@@ -38,7 +38,7 @@ export class SubOpcode extends Opcode {
   static id = 0x03;
   static type = "SUB";
 
-  run(state: IMachineState): void {
+  run(state: MachineState): void {
     const arg1 = state.stack.pop();
     const arg2 = state.stack.pop();
 
@@ -53,7 +53,7 @@ export class DivOpcode extends Opcode {
   static id = 0x04;
   static type = "DIV";
 
-  run(state: IMachineState): void {
+  run(state: MachineState): void {
     const arg1 = state.stack.pop();
     const arg2 = state.stack.pop();
 
@@ -68,7 +68,7 @@ export class ExpOpcode extends Opcode {
   static id = 0x0a;
   static type = "EXP";
 
-  run(state: IMachineState): void {
+  run(state: MachineState): void {
     const arg1 = state.stack.pop();
     const arg2 = state.stack.pop();
 
@@ -83,7 +83,7 @@ export class IsZeroOpcode extends Opcode {
   static id = 0x15;
   static type = "ISZERO";
 
-  run(state: IMachineState): void {
+  run(state: MachineState): void {
     const arg1 = state.stack.pop();
 
     const result = arg1.isZero() ? new BN(1) : new BN(0);
@@ -97,7 +97,7 @@ export class AndOpcode extends Opcode {
   static id = 0x16;
   static type = "AND";
 
-  run(state: IMachineState): void {
+  run(state: MachineState): void {
     const arg1 = state.stack.pop();
     const arg2 = state.stack.pop();
 
@@ -112,7 +112,7 @@ export class EqOpcode extends Opcode {
   static id = 0x14;
   static type = "EQ";
 
-  run(state: IMachineState): void {
+  run(state: MachineState): void {
     const arg1 = state.stack.pop();
     const arg2 = state.stack.pop();
 

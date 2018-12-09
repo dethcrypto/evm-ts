@@ -1,6 +1,6 @@
 import { Opcode } from "./common";
 import { BN } from "bn.js";
-import { IMachineState, IEnvironment } from "../types";
+import { MachineState, Environment } from "../types";
 import { VM } from "../VM";
 
 /**
@@ -10,7 +10,7 @@ export class SStoreOpcode extends Opcode {
   static id = 0x55;
   static type = "SSTORE";
 
-  run(state: IMachineState, env: IEnvironment, vm: VM): void {
+  run(state: MachineState, env: Environment, vm: VM): void {
     const location = state.stack.pop().toString(16);
     const value = state.stack.pop().toString(16);
 
@@ -34,7 +34,7 @@ export class SLoadOpcode extends Opcode {
   static id = 0x54;
   static type = "SLOAD";
 
-  run(state: IMachineState, env: IEnvironment, vm: VM): void {
+  run(state: MachineState, env: Environment, vm: VM): void {
     const location = state.stack.pop().toString(16);
     const account = vm.blockchain.getAddress(env.account);
     const value = account.storage[location] || "0";

@@ -1,7 +1,7 @@
 import { Opcode } from "./common";
 import { PeekableIterator } from "../utils/PeekableIterator";
 import { getIndex } from "../utils/arrays";
-import { IMachineState } from "../types";
+import { MachineState } from "../types";
 
 /**
  * DUP is a family of opcodes.
@@ -27,7 +27,7 @@ export class DupOpcode extends Opcode {
     super(baseId + stackIndex, `${baseType}${stackIndex}`);
   }
 
-  run(state: IMachineState): void {
+  run(state: MachineState): void {
     const elementToDuplicate = getIndex(state.stack, -this.stackIndex);
 
     if (!elementToDuplicate) {

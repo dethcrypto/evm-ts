@@ -2,7 +2,7 @@ import { BN } from "bn.js";
 
 import { Opcode } from "./common";
 import { arrayCopy } from "../utils/arrays";
-import { IMachineState, IEnvironment } from "../types";
+import { MachineState, Environment } from "../types";
 
 /**
  * Stores full word in memory.
@@ -11,7 +11,7 @@ export class MStoreOpcode extends Opcode {
   static id = 0x52;
   static type = "MSTORE";
 
-  run(state: IMachineState): void {
+  run(state: MachineState): void {
     const address = state.stack.pop().toNumber();
 
     const value = state.stack.pop();
@@ -31,7 +31,7 @@ export class MLoadOpcode extends Opcode {
   static id = 0x51;
   static type = "MLOAD";
 
-  run(state: IMachineState): void {
+  run(state: MachineState): void {
     const address = state.stack.pop().toNumber();
     const valueRaw = state.memory.slice(address, address + 32);
 
@@ -49,7 +49,7 @@ export class CodeCopyOpcode extends Opcode {
   static id = 0x39;
   static type = "CODECOPY";
 
-  run(state: IMachineState, env: IEnvironment): void {
+  run(state: MachineState, env: Environment): void {
     const memOffset = state.stack.pop().toNumber();
     const codeOffset = state.stack.pop().toNumber();
     const length = state.stack.pop().toNumber();

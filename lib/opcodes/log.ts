@@ -1,6 +1,6 @@
 import { Opcode, notImplementedError } from "./common";
 import { PeekableIterator } from "../utils/PeekableIterator";
-import { IMachineState } from "../types";
+import { MachineState } from "../types";
 
 /**
  * LOG is a family of opcodes.
@@ -26,7 +26,7 @@ export class LogOpcode extends Opcode {
     super(baseId + stackIndex, `${baseType}${stackIndex}`);
   }
 
-  run(_state: IMachineState): void {
+  run(_state: MachineState): void {
     notImplementedError();
   }
 }

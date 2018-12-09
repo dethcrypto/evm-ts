@@ -5,10 +5,10 @@ import { EVMJS, commonAddressString } from "./EVMJS";
 import { FakeBlockchain } from "../../lib/FakeBlockchain";
 import { byteStringToNumberArray } from "../../lib/utils/bytes";
 import { BN } from "bn.js";
-import { IEnvironment, IExternalTransaction, ITransactionResult, IStepContext, IMachineState } from "lib/types";
+import { Environment, ExternalTransaction, TransactionResult, StepContext, MachineState } from "lib/types";
 import { Dictionary } from "ts-essentials";
 
-export async function compareWithReferentialImpl(code: string, env?: Partial<IEnvironment>): Promise<void> {
+export async function compareWithReferentialImpl(code: string, env?: Partial<Environment>): Promise<void> {
   const evmJs = new EVMJS();
   await evmJs.setup();
 
@@ -28,7 +28,7 @@ export async function compareInvalidCodeWithReferentialImpl(
   code: string,
   jsError: string,
   tsError: string,
-  env?: Partial<IEnvironment>,
+  env?: Partial<Environment>,
 ): Promise<void> {
   const evmJs = new EVMJS();
   await evmJs.setup();
@@ -40,11 +40,11 @@ export async function compareInvalidCodeWithReferentialImpl(
   expect(() => runEvm(code, { value: env && env.value, data: env && env.data })).to.throw(tsError);
 }
 
-export interface IEqualAccount {
+export interface EqualAccount {
   storage: Dictionary<string>;
 }
 
-export interface IEqualState {
+export interface EqualState {
   opcode: string;
   stack: string;
   memory: string;
@@ -54,9 +54,9 @@ export interface IEqualState {
   data: string;
 }
 
-interface IVm {
+interface Vm {
   type: "js" | "ts";
-  runTx(tx: IExternalTransaction): Promise<ITransactionResult>;
+  runTx(tx: ExternalTransaction): Promise<TransactionResult>;
 }
 
 /**
@@ -64,7 +64,7 @@ interface IVm {
  * When we reach higher compatibility with EthereumJS this can be greatly simplified just by running script once and basically everything should be the same on both implementations.
  * Currently evm-ts returns totally different addresses etc.
  */
-export async function compareTransactionsWithReferentialImpl(script: (vm: IVm) => Promise<void>): Promise<void> {
+export async function compareTransactionsWithReferentialImpl(script: (vm: Vm) => Promise<void>): Promise<void> {
   const evmJs = new EVMJS();
   await evmJs.setup();
   const evmTsBlockchain = new FakeBlockchain();
@@ -73,8 +73,8 @@ export async function compareTransactionsWithReferentialImpl(script: (vm: IVm) =
     setupDebuggingLogs(evmJs, evmTsBlockchain);
   }
 
-  const evmJsStates: IEqualState[][] = [];
-  const evmTsStates: IEqualState[][] = [];
+  const evmJsStates: EqualState[][] = [];
+  const evmTsStates: EqualState[][] = [];
 
   // HACK: this is a function injected only during tests that allow not implemented correctly opcodes access value from referential impl in JS so all values match
   (global as any).getStackValueFromJsEVM = (): any => {
@@ -103,7 +103,7 @@ export async function compareTransactionsWithReferentialImpl(script: (vm: IVm) =
   evmJs.vm.on("step", evmJsStepListener);
 
   // setup TS event listeners
-  const evmTsStepListener = (ctx: IStepContext) => {
+  const evmTsStepListener = (ctx: StepContext) => {
     getLastElement(evmTsStates).push({
       opcode: ctx.currentOpcode.type,
       stack: ctx.previousState.stack.toString(),
@@ -134,9 +134,9 @@ export async function compareTransactionsWithReferentialImpl(script: (vm: IVm) =
   evmTsBlockchain.vm.on("step", evmTsStepListener);
 
   // run js impl
-  const jsVmAdapter: IVm = {
+  const jsVmAdapter: Vm = {
     type: "js",
-    async runTx(tx: IExternalTransaction): Promise<ITransactionResult> {
+    async runTx(tx: ExternalTransaction): Promise<TransactionResult> {
       evmJsStates.push([]); // prepare empty state for listeners
       return await evmJs.runTx(tx);
     },
@@ -144,9 +144,9 @@ export async function compareTransactionsWithReferentialImpl(script: (vm: IVm) =
   await script(jsVmAdapter);
 
   // run ts impl
-  const tsVmAdapter: IVm = {
+  const tsVmAdapter: Vm = {
     type: "ts",
-    async runTx(tx: IExternalTransaction): Promise<ITransactionResult> {
+    async runTx(tx: ExternalTransaction): Promise<TransactionResult> {
       evmTsStates.push([]); // prepare empty state for listeners
       return evmTsBlockchain.runTx({
         from: commonAddressString,
@@ -165,7 +165,7 @@ export async function compareTransactionsWithReferentialImpl(script: (vm: IVm) =
   }
 
   const jsBlockchainState = await evmJs.getFullBlockchainDump();
-  const tsBlockchainState: Dictionary<IEqualAccount> = mapValues(evmTsBlockchain.dumpLayers(), acc => ({
+  const tsBlockchainState: Dictionary<EqualAccount> = mapValues(evmTsBlockchain.dumpLayers(), acc => ({
     storage: acc.storage,
   }));
   expect(tsBlockchainState).to.deep.eq(jsBlockchainState);
@@ -173,8 +173,8 @@ export async function compareTransactionsWithReferentialImpl(script: (vm: IVm) =
 
 export function runEvm(
   bytecode: string,
-  env?: Partial<IEnvironment>,
-): { state: IMachineState; blockchain: FakeBlockchain } {
+  env?: Partial<Environment>,
+): { state: MachineState; blockchain: FakeBlockchain } {
   const fakeBlockchain = new FakeBlockchain();
 
   const result = fakeBlockchain.vm.runCode({
